@@ -4,10 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ page.description | default: site.description }}">
+    <meta name="theme-color" content="#eef8ff">
     <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   </head>
   <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="ambient ambient-three" aria-hidden="true"></div>
     <header class="site-header">
       <a class="brand" href="{{ '/' | relative_url }}" aria-label="返回首页">
         <span class="brand-mark">X</span><span>{{ site.title }}</span>
@@ -19,6 +23,6 @@
       </nav>
     </header>
     <main>{{ content }}</main>
-    <footer><span>© {{ site.time | date: '%Y' }} {{ site.title }}</span><span>Built with Obsidian · GitHub Pages</span></footer>
+    <footer><span>© {{ site.time | date: '%Y' }} {{ site.title }}</span><span>Written in Obsidian · Published on GitHub</span></footer>
   </body>
 </html>
