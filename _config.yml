@@ -1,0 +1,15 @@
+title: 玄一言
+description: 记录学习、思考与生活。
+url: "https://xuaniyan1.github.io"
+lang: zh-CN
+timezone: Asia/Shanghai
+markdown: kramdown
+permalink: /:categories/:year/:month/:day/:title/
+paginate: 8
+paginate_path: "/page:num/"
+plugins:
+  - jekyll-paginate
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
