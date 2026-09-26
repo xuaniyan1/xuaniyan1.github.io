@@ -646,7 +646,7 @@ int xstart, ystart;
 int n;
 vector<Pos> path;
 bool vis[1001][1001];
-Pos dir[4] = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}};
+Pos dir[4] = { {0, 1}, {1, 0}, {-1, 0}, {0, -1}};
 // vector<ll> a(maxn);
 // vector<ll> sum(maxn);
 void dfs(Pos pos) // 当前人物所在位置 dfs 当前已有的path 和当前vis了哪些点 接下来我以站在pos的位置到达终点的path方法
