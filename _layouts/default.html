@@ -7,6 +7,32 @@
     <meta name="theme-color" content="#eef8ff">
     <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    {% if page.math %}
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, function (doc) {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = {node: text, delim: '', n: 0};
+                math.end = {node: text, delim: '', n: 0};
+                doc.math.push(math);
+              }
+            }, '']
+          }
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    {% endif %}
   </head>
   <body{% if page.url == '/' %} class="home-page"{% endif %}>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -18,6 +44,7 @@
       </a>
       <nav aria-label="主导航">
         <a href="{{ '/' | relative_url }}">文章</a>
+        <a href="{{ '/navigation/' | relative_url }}">总导航</a>
         <a href="{{ '/about/' | relative_url }}">关于</a>
         <a class="github-link" href="https://github.com/xuaniyan1" target="_blank" rel="noreferrer">GitHub <span>↗</span></a>
       </nav>
