@@ -1,18 +1,20 @@
-# Code Atelier · 408 数据结构实战练习场
+# Code Atelier · 北航复试机试真题库
 
-在线地址：<https://xuaniyan1.github.io/code-atelier/>
+入口：<https://xuaniyan1.github.io/code-atelier/buaa-exams/>
 
-- 17 道编程练习、92 组在线测试；其中链表专题 5 道题、48 组测试。
-- 支持 Python 3、C11、C++17。
-- Python 通过浏览器内 Pyodide 运行；C / C++ 通过 Wandbox 在线编译服务运行。
-- C / C++ 运行时，源代码和标准输入会发送给第三方 Wandbox 服务；不要提交密码、隐私或密钥。
-- 练习进度保存在当前浏览器，不会自动云同步；可使用页面中的备份 / 导入功能转移进度。
+## 内容
+- 24 道可判题，73 组公开测评数据。
+- 支持 C11、C++17、Python 3；通过 Wandbox API 编译运行。
+- 题目来源和题意可信度逐题标注；早期题目根据公开参考代码重建，2015—2021 部分来自复习指南整理。
+- 2023—2025 部分题目目前只有索引或年份存在冲突，先保留来源链接，不伪造完整题面。
+- 测试数据随静态页面发布，属于公开测评数据，不是保密的服务端隐藏用例。
 
-这是个人教学练习工具。在线编译服务可能限流或暂时不可用。
+## 隐私与服务
+提交代码和测试输入会发送到第三方 Wandbox 服务；不要提交密码、隐私或密钥。Wandbox 可能限流或暂时不可用。
+练习代码保存在当前浏览器的 localStorage，不会自动云同步。
 
-
-## 北航复试真题库
-
-- 页面：`buaa-exams/index.html`（从 Code Atelier 首页右上角进入）。
-- 收录 2006—2025 年公开回忆整理题目索引；2020 年标注为未举行现场机试，另有年份归属待核验的补充回忆。
-- 题意摘要根据公开代码或题库索引整理，不代表官方原卷；每题保留原始来源链接，近年部分题面可能需要在 N 诺登录后查看。
+## 来源
+- https://github.com/finlay-liu/BuaaMasterQuestion
+- https://github.com/Muyiyunzi/BUAA-CS-Codes
+- https://noobdream.com/DreamJudge/Issue/page/0/?algorithm_type=All&page=1&problem_id_name=&problem_source=%E5%8C%97%E4%BA%AC%E8%88%AA%E7%A9%BA%E8%88%AA%E5%A4%A9%E5%A4%A7%E5%AD%A6
+- https://damodev.csdn.net/6a438b5310ee7a33f285093d.html
