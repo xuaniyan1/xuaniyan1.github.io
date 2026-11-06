@@ -10,4 +10,21 @@ window.__ATELIER_PROBLEMS_GZIP__=pack.problems;
 window.__ATELIER_WORKER_URL__=URL.createObjectURL(new Blob([pack.worker],{type:'text/javascript'}));
 const script=document.createElement('script');script.textContent=pack.js;document.body.appendChild(script);
 })().catch(error=>{document.body.innerHTML='<main style="padding:2rem;font:16px sans-serif">页面加载失败：'+String(error)+'</main>';});
-</script></body></html>
+</script>
+<script id="buaa-exams-nav">
+(function(){
+ function attach(){
+  if(document.getElementById('buaa-exams-nav-link')) return true;
+  var text=(document.body.innerText||'').trim();
+  if(text.length<80 || text.indexOf('正在加载 408 数据结构练习场')>=0) return false;
+  var a=document.createElement('a');
+  a.id='buaa-exams-nav-link';a.href='./buaa-exams/';a.textContent='北航复试真题';
+  a.style.cssText='position:fixed;right:18px;top:16px;z-index:99999;padding:9px 14px;border:1px solid #cbd8cd;border-radius:999px;background:#fff;color:#286b50;text-decoration:none;font:600 13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 4px 14px rgba(25,50,30,.10)';
+  document.body.appendChild(a);return true;
+ }
+ var observer=new MutationObserver(function(){if(attach())observer.disconnect();});
+ observer.observe(document.body,{childList:true,subtree:true});
+ attach();
+})();
+</script>
+</body></html>
