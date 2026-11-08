@@ -335,3 +335,5 @@ warmExecutionEngine = function() {
  $('engine').textContent = '正在预热 Judge0…';
  atelierJudge0EnsureReady().then(() => engineLabel()).catch(() => engineLabel());
 };
+$('editor').removeEventListener('focus', atelierOldWarmExecutionEngine);
+$('editor').addEventListener('focus', warmExecutionEngine);
