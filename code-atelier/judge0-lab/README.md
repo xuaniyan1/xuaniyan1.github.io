@@ -41,3 +41,31 @@ It submits the ZIP as `additional_files` with `language_id: 89`. For this langua
 ## Production safety
 
 The production entrypoint `code-atelier/index.html`, the question bank, and the existing test-case data are not changed by this lab. No production judge routing is switched to Judge0.
+
+## Judge0-backed preview of the full practice site
+
+After the Pages deployment finishes, open:
+
+- https://xuaniyan1.github.io/code-atelier/judge0-preview.html
+
+This is a separate copy of the full Code Atelier app. It routes remote C11/C++17 runs and submissions through the Judge0 Multi-file Program adapter in `judge0-runtime.js`; Python remains on the existing Pyodide worker. The preview uses a separate localStorage key (`atelier-judge0-preview-v1)), so its drafts and progress do not overwrite the production site's `atelier-v1` data.
+
+### What changed in the preview
+
+- C11: one Multi-file submission; `compile` uses `gcc -std=c11`.
+- C++17: one Multi-file submission; `compile` uses `g++ -std=c++17`.
+- The compile script runs once. The run script starts a fresh process for every test input.
+- Each test has a 3-second process timeout; the Judge0 outer sandbox has bounded CPU, wall-clock, memory, and file-size limits.
+- The browser compares each output with the existing problem bank's expected output. Existing problem data and result-panel UI are reused.
+- The previous Wandbox runner remains in the original production file and is not overwritten.
+
+### Preview test checklist
+
+1. Open the preview page and select C++17.
+2. Run one existing problem with the Run button; confirm the output panel displays the expected output.
+3. Submit the same problem; confirm every test case is listed and AC/WA/RE/TLE is classified correctly.
+4. Repeat with C11.
+5. Switch to Python and confirm the existing Pyodide path still works.
+6. Confirm the production page still uses Wandbox and that its saved drafts/progress are unchanged.
+
+Do not replace the production entrypoint until these checks pass on representative problems, including at least one compile-error case and one deliberately wrong-answer case.
