@@ -69,3 +69,16 @@ This is a separate copy of the full Code Atelier app. It routes remote C11/C++17
 6. Confirm the production page still uses Wandbox and that its saved drafts/progress are unchanged.
 
 Do not replace the production entrypoint until these checks pass on representative problems, including at least one compile-error case and one deliberately wrong-answer case.
+
+## Performance follow-up
+
+The preview now runs up to **two test cases concurrently** after the single compile step. Each case still gets a fresh process and its own stdin/stdout/stderr files; results are emitted in the original test order. Concurrency is deliberately capped at two to reduce wall time without multiplying peak memory use too aggressively.
+
+The preview also appends a timing breakdown after a submission:
+- archive preparation time;
+- POST submission time;
+- time spent polling for the completed Judge0 result;
+- approximate queue and processing intervals when the API exposes a Processing state;
+- Judge0 server wall time, when returned.
+
+The public CE queue is outside the browser's control. If the new timing line shows most time under “等待” while the server wall time is small, the bottleneck is the shared public service/network, not local compilation or sequential test execution. A private/self-hosted Judge0 instance or a dedicated execution service would be needed for predictable low latency.
