@@ -52,8 +52,8 @@ for (const problem of problems) {
   categoryCounts.set(problem.category, (categoryCounts.get(problem.category) ?? 0) + 1);
 
   const tests = cases[problem.id];
-  if (!Array.isArray(tests) || tests.length === 0) {
-    throw new Error(`Problem ${problem.id} has no runnable test cases.`);
+  if (!Array.isArray(tests) || tests.length < 4) {
+    throw new Error(`Problem ${problem.id} must have at least four runnable test cases.`);
   }
   for (let index = 0; index < tests.length; index++) {
     const test = tests[index];
@@ -105,4 +105,4 @@ if (!html.includes("c[2]||") || !html.includes("p.sampleLabel||")) {
 }
 
 console.log(`Question bank validation passed: ${problems.length} problems, ${categoryCounts.size} categories, ${totalCases} test cases, ${inlineScripts.length} JavaScript block(s).`);
-console.log("All problems have runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
+console.log("All problems have at least four runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
