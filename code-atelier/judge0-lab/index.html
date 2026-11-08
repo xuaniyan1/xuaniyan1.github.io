@@ -171,33 +171,43 @@ function classify(exitCode,stdout,expected){
  return normalize(stdout)===normalize(expected)?"AC":"WA";
 }
 async function checkApis(){
- log("检查 Judge0 GET /languages …");
- const j=await fetchJson(apiBase("judge0Base")+"/languages",{},20000);
- if(!Array.isArray(j.data))throw new Error("Judge0 /languages 返回格式异常");
- judgeCpp=j.data.find(x=>x.id===105)||j.data.find(x=>/^C\+\+ \(GCC/.test(x.name||""))||j.data.find(x=>/^C\+\+/.test(x.name||""));
- judgeMulti=j.data.find(x=>x.id===J0_MULTI_ID);
- setCard("j0State","GET 可访问","ok","HTTP "+j.status+" · "+j.ms.toFixed(0)+" ms");
- if(judgeCpp){
-  setCard("cppState","已发现","ok","ID "+judgeCpp.id+" · "+judgeCpp.name);
- }else{
-  setCard("cppState","未找到 C++","bad","/languages 中没有 C++ 编译器");
+ let j=null,w=null,cfg=null;
+ log("检查 Judge0 GET /languages 与 /config_info …");
+ try{
+  j=await fetchJson(apiBase("judge0Base")+"/languages",{},20000);
+  if(!Array.isArray(j.data))throw new Error("Judge0 /languages 返回格式异常");
+  judgeCpp=j.data.find(x=>x.id===105)||j.data.find(x=>/^C\+\+ \(GCC/.test(x.name||""))||j.data.find(x=>/^C\+\+/.test(x.name||""));
+  judgeMulti=j.data.find(x=>x.id===J0_MULTI_ID);
+  cfg=(await fetchJson(apiBase("judge0Base")+"/config_info",{},20000)).data;
+  setCard("j0State","GET 可访问","ok","HTTP "+j.status+" · "+j.ms.toFixed(0)+" ms");
+  if(judgeCpp)setCard("cppState","已发现","ok","ID "+judgeCpp.id+" · "+judgeCpp.name);
+  else setCard("cppState","未找到 C++","bad","/languages 中没有 C++ 编译器");
+  const multiReady=!!judgeMulti&&cfg.enable_additional_files===true;
+  setCard("multiState",multiReady?"已启用":"不可用",multiReady?"ok":"bad",multiReady?"ID 89 · additional_files 已启用":"语言 ID 89 或 additional_files 不可用");
+  log("Judge0 /languages：HTTP "+j.status+"，"+j.data.length+" 个语言，"+j.ms.toFixed(0)+" ms");
+  log("C++ 编译器："+(judgeCpp?judgeCpp.name+"（ID "+judgeCpp.id+"）":"未找到"));
+  log("Judge0 配置：maintenance="+cfg.maintenance_mode+"，additional_files="+cfg.enable_additional_files+"，wait_result="+cfg.enable_wait_result+"，CPU上限="+cfg.max_cpu_time_limit+"s，wall上限="+cfg.max_wall_time_limit+"s");
+  if(cfg.maintenance_mode)log("警告：Judge0 当前处于维护模式。");
+  if(!multiReady)log("警告：当前实例没有启用 Multi-file Program 所需的能力。");
+ }catch(error){
+  setCard("j0State","GET 失败","bad",error.message);
+  log("Judge0 检查失败："+error.message);
+  judgeCpp=null;judgeMulti=null;cfg=null;
  }
- if(judgeMulti){
-  setCard("multiState","已发现","ok","ID "+judgeMulti.id+" · "+judgeMulti.name);
- }else{
-  setCard("multiState","未找到","bad","公共实例未提供语言 ID 89");
- }
- log("Judge0 /languages：HTTP "+j.status+"，"+j.data.length+" 个语言，"+j.ms.toFixed(0)+" ms");
- log("C++ 编译器："+(judgeCpp?judgeCpp.name+"（ID "+judgeCpp.id+"）":"未找到"));
- log("Multi-file："+(judgeMulti?"可用（ID 89）":"不可用"));
  log("检查 Wandbox GET /list.json …");
- const w=await fetchJson(apiBase("wandboxBase")+"/list.json",{},20000);
- if(!Array.isArray(w.data))throw new Error("Wandbox /list.json 返回格式异常");
- wandboxCpp=w.data.find(x=>x.language==="C++"&&x.name==="gcc-head")||w.data.find(x=>x.language==="C++"&&/gcc/.test(x.name||""))||w.data.find(x=>x.language==="C++");
- setCard("wbState","GET 可访问","ok","HTTP "+w.status+" · "+w.ms.toFixed(0)+" ms");
- log("Wandbox /list.json：HTTP "+w.status+"，"+w.data.length+" 个编译器，"+w.ms.toFixed(0)+" ms");
- log("Wandbox C++ 编译器："+(wandboxCpp?wandboxCpp.name+"（"+wandboxCpp.version+"）":"未找到"));
- return {judge0:j,wandbox:w};
+ try{
+  w=await fetchJson(apiBase("wandboxBase")+"/list.json",{},20000);
+  if(!Array.isArray(w.data))throw new Error("Wandbox /list.json 返回格式异常");
+  wandboxCpp=w.data.find(x=>x.language==="C++"&&x.name==="gcc-head")||w.data.find(x=>x.language==="C++"&&/gcc/.test(x.name||""))||w.data.find(x=>x.language==="C++");
+  setCard("wbState","GET 可访问","ok","HTTP "+w.status+" · "+w.ms.toFixed(0)+" ms");
+  log("Wandbox /list.json：HTTP "+w.status+"，"+w.data.length+" 个编译器，"+w.ms.toFixed(0)+" ms");
+  log("Wandbox C++ 编译器："+(wandboxCpp?wandboxCpp.name+"（"+wandboxCpp.version+"）":"未找到"));
+ }catch(error){
+  setCard("wbState","GET 失败","bad",error.message);
+  log("Wandbox 检查失败："+error.message);
+  wandboxCpp=null;
+ }
+ return {judge0:j,config:cfg,wandbox:w};
 }
 async function submitJudge0(payload){
  const result=await fetchJson(apiBase("judge0Base")+"/submissions?base64_encoded=false",{
@@ -230,14 +240,15 @@ async function pollJudge0(token,label){
 async function runJudge0CppSmoke(){
  if(!judgeCpp)throw new Error("没有找到 Judge0 C++ 编译器");
  const code="#include <iostream>\nusing namespace std;\nint main(){ cout << \"JUDGE0_CPP17_OK\\n\"; return 0; }\n";
- const payload={language_id:judgeCpp.id,source_code:code,compiler_options:"-std=c++17 -O2",stdin:"",expected_output:"JUDGE0_CPP17_OK\n"};
+ const payload={language_id:judgeCpp.id,source_code:code,compiler_options:"-std=c++17 -O2",stdin:"",expected_output:"JUDGE0_CPP17_OK\n",cpu_time_limit:5,wall_time_limit:10,memory_limit:256000};
  const submitted=await submitJudge0(payload);
  const result=await pollJudge0(submitted.token,"Judge0 C++17 单文件验证");
  const status=result.status||{};
  const ok=status.id===3;
  setCard("cppState",ok?"POST / C++17 通过":"C++17 执行失败",ok?"ok":"bad",status.description||"status "+status.id);
+ if(ok)setCard("j0State","GET + POST/CORS 通过","ok","JSON POST 成功 · CORS 预检通过");
  log("Judge0 C++17 smoke："+(ok?"通过":"失败")+"；status="+status.id+" "+(status.description||""));
- if(!ok)log("C++17 诊断："+decodeB64(result.compile_output)||decodeB64(result.stderr)||result.message||"无额外错误信息");
+ if(!ok){const diagnostic=decodeB64(result.compile_output)||decodeB64(result.stderr)||result.message||"无额外错误信息";log("C++17 诊断："+diagnostic);}
  return ok;
 }
 async function runWandboxCase(code,test){
@@ -366,7 +377,7 @@ async function runJudge0Multi(code){
  if(!judgeMulti)throw new Error("Judge0 公共实例没有暴露 Multi-file Program（ID 89）");
  const zip=makeMultiZip(code);
  log("Multi-file ZIP 已生成："+Math.round(zip.length*0.75)+" bytes（Base64 后 "+zip.length+" 字符）");
- const submitted=await submitJudge0({language_id:J0_MULTI_ID,additional_files:zip});
+ const submitted=await submitJudge0({language_id:J0_MULTI_ID,additional_files:zip,cpu_time_limit:10,cpu_extra_time:2,wall_time_limit:20,memory_limit:256000,stack_limit:64000,max_processes_and_or_threads:20,enable_network:false});
  const result=await pollJudge0(submitted.token,"Judge0 Multi-file（一次编译、四组运行）");
  const status=result.status||{};
  if(status.id!==3){
@@ -426,16 +437,16 @@ async function runFull(){
  try{
   setProgress(5,"第 1 步：检查公共 API…");
   await checkApis();
-  if(!judgeCpp)throw new Error("Judge0 没有可用的 C++ 编译器，无法验证 C++17");
-  if(!wandboxCpp)throw new Error("Wandbox 没有可用的 C++ 编译器，无法进行当前流程对比");
-  setProgress(15,"第 2 步：验证 Judge0 C++17 和浏览器 POST CORS…");
-  const smokeOk=await runJudge0CppSmoke();
-  if(!smokeOk)throw new Error("Judge0 C++17 单文件验证未通过；请查看日志。");
-  setProgress(30,"第 3 步：运行 Wandbox 基线（4 次编译运行）…");
+  if(!wandboxCpp)throw new Error("Wandbox C++ 编译器列表不可用，无法完成当前流程基线对比");
+  setProgress(15,"第 2 步：运行 Wandbox 基线（4 次编译运行）…");
   const wb=await runWandboxBaseline($("source").value);
   groups.push(wb);renderSummary(groups);renderCases(groups);
   log("Wandbox 基线："+wb.passed+"/"+wb.results.length+" 通过，端到端 "+wb.elapsed.toFixed(0)+" ms");
-  setProgress(65,"第 4 步：运行 Judge0 Multi-file（1 次提交）…");
+  if(!judgeCpp||!judgeMulti)throw new Error("Wandbox 基线已完成，但 Judge0 C++ / Multi-file 资源不可用；请查看 API 检查结果。");
+  setProgress(55,"第 3 步：验证 Judge0 C++17 和浏览器 POST CORS…");
+  const smokeOk=await runJudge0CppSmoke();
+  if(!smokeOk)throw new Error("Wandbox 基线已完成；Judge0 C++17 单文件验证未通过，Multi-file 对比暂缓。");
+  setProgress(75,"第 4 步：运行 Judge0 Multi-file（1 次提交）…");
   const multi=await runJudge0Multi($("source").value);
   groups.push(multi);renderSummary(groups);renderCases(groups);
   log("Judge0 Multi-file："+multi.passed+"/"+multi.results.length+" 通过，端到端 "+multi.elapsed.toFixed(0)+" ms");
