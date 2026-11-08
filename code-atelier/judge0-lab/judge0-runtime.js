@@ -360,6 +360,7 @@ showResult = function(result, action) {
  if (action === 'submit') {
   const details = [
    '总耗时 ' + seconds(result.elapsedMs),
+   '预检 ' + seconds(t.readyMs),
    '打包 ' + seconds(t.archiveMs),
    '提交 ' + seconds(t.submitMs),
    '等待 ' + seconds(t.pollMs)
