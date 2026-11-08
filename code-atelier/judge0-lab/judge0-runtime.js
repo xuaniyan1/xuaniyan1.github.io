@@ -177,21 +177,30 @@ function atelierJudge0BuildArchive(data, tests) {
   'set +e',
   'tmp_dir=$(mktemp -d)',
   "trap 'rm -rf \"$tmp_dir\"' EXIT",
-  'for input_file in tests/*.in; do',
-  '  [ -f "$input_file" ] || continue',
+  'run_one() {',
+  '  input_file="$1"',
   '  case_id=$(basename "$input_file" .in)',
   '  start_ns=$(date +%s%N)',
-  '  timeout -k 1s 3s ./main < "$input_file" > "$tmp_dir/out" 2> "$tmp_dir/err"',
+  '  timeout -k 1s 3s ./main < "$input_file" > "$tmp_dir/$case_id.out" 2> "$tmp_dir/$case_id.err"',
   '  exit_code=$?',
   '  end_ns=$(date +%s%N)',
   '  elapsed_ms=0',
   '  if [[ "$start_ns" =~ ^[0-9]+$ && "$end_ns" =~ ^[0-9]+$ ]]; then elapsed_ms=$(( (end_ns - start_ns) / 1000000 )); fi',
   '  if [ "$exit_code" -eq 124 ] || [ "$exit_code" -eq 137 ]; then exit_code=124; fi',
-  '  printf "ATELIER_CASE|%s|%s|%s|" "$case_id" "$exit_code" "$elapsed_ms"',
-  '  base64 -w 0 "$tmp_dir/out"',
-  '  printf "|"',
-  '  base64 -w 0 "$tmp_dir/err"',
-  '  printf "\\n"',
+  '  { printf "ATELIER_CASE|%s|%s|%s|" "$case_id" "$exit_code" "$elapsed_ms"; base64 -w 0 "$tmp_dir/$case_id.out"; printf "|"; base64 -w 0 "$tmp_dir/$case_id.err"; printf "\\n"; } > "$tmp_dir/$case_id.result"',
+  '}',
+  'active=0',
+  'for input_file in tests/*.in; do',
+  '  [ -f "$input_file" ] || continue',
+  '  run_one "$input_file" &',
+  '  active=$((active + 1))',
+  '  if [ "$active" -ge 2 ]; then wait -n || true; active=$((active - 1)); fi',
+  'done',
+  'wait || true',
+  'for input_file in tests/*.in; do',
+  '  [ -f "$input_file" ] || continue',
+  '  case_id=$(basename "$input_file" .in)',
+  '  if [ -f "$tmp_dir/$case_id.result" ]; then cat "$tmp_dir/$case_id.result"; else printf "ATELIER_CASE|%s|1|0||\\n" "$case_id"; fi',
   'done',
   'exit 0',
   ''
@@ -216,15 +225,25 @@ async function atelierJudge0Poll(token, action, signal) {
   '?base64_encoded=true&fields=' + encodeURIComponent(fields);
  const started = performance.now();
  let polls = 0;
+ let firstProcessingAt = null;
  while (performance.now() - started < 90000) {
   const result = await atelierJudge0Request(url, {}, signal, 20000);
   polls++;
   const statusId = Number(result.status && result.status.id);
-  if (statusId !== 1 && statusId !== 2) return result;
+  if (statusId === 2 && firstProcessingAt === null) firstProcessingAt = performance.now();
+  if (statusId !== 1 && statusId !== 2) {
+   const finishedAt = performance.now();
+   return {
+    result, polls,
+    pollMs: Math.round(finishedAt - started),
+    queueWaitMs: firstProcessingAt === null ? null : Math.round(firstProcessingAt - started),
+    executionWaitMs: firstProcessingAt === null ? null : Math.round(finishedAt - firstProcessingAt)
+   };
+  }
   const label = statusId === 1 ? '排队中' : '执行中';
   if (action === 'run') $('runStatus').textContent = 'Judge0 ' + label + '…';
   else $('judgeSummary').textContent = 'Judge0 ' + label + ' · 已查询 ' + polls + ' 次…';
-  await waitRemote(450, signal);
+  await waitRemote(polls <= 3 ? 250 : 400, signal);
  }
  throw Error('Judge0 等待结果超过 90 秒，请稍后重试。');
 }
@@ -233,9 +252,13 @@ async function atelierJudge0Run(data, signal) {
  const tests = data.action === 'run' ? [{ input: data.stdin, expected: '' }] : (current.tests || []);
  if (!tests.length) return { status: 'FAILED', passed: 0, total: 0, results: [] };
  const started = performance.now();
+ const readyStarted = performance.now();
  await atelierJudge0EnsureReady();
+ const readyMs = Math.round(performance.now() - readyStarted);
  if (signal && signal.aborted) throw new DOMException('已停止运行。', 'AbortError');
+ const archiveStarted = performance.now();
  const archive = atelierJudge0BuildArchive(data, tests);
+ const archiveMs = Math.round(performance.now() - archiveStarted);
  if (data.action === 'run') $('runStatus').textContent = '正在打包并提交 Judge0…';
  else $('judgeSummary').textContent = '正在打包并提交 Judge0（' + tests.length + ' 组测试）…';
 
@@ -250,14 +273,21 @@ async function atelierJudge0Run(data, signal) {
   max_file_size: 1024,
   enable_network: false
  };
+ const submitStarted = performance.now();
  const submitted = await atelierJudge0Request(
   ATELIER_JUDGE0_API + '/submissions?base64_encoded=false',
   { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) },
   signal,
   30000
  );
+ const submitMs = Math.round(performance.now() - submitStarted);
  if (!submitted || !submitted.token) throw Error('Judge0 没有返回提交 token。');
- const result = await atelierJudge0Poll(submitted.token, data.action, signal);
+ const pollInfo = await atelierJudge0Poll(submitted.token, data.action, signal);
+ const result = pollInfo.result;
+ const timings = {
+  readyMs, archiveMs, submitMs, pollMs: pollInfo.pollMs, polls: pollInfo.polls,
+  queueWaitMs: pollInfo.queueWaitMs, executionWaitMs: pollInfo.executionWaitMs
+ };
  const statusId = Number(result.status && result.status.id);
  const description = String(result.status && result.status.description || '未知状态');
  const compileOutput = atelierJudge0DecodeBase64(result.compile_output);
@@ -267,7 +297,7 @@ async function atelierJudge0Run(data, signal) {
   if (statusId === 5) verdict = 'TLE';
   else if (statusId === 6) verdict = 'CE';
   const message = verdict === 'CE' ? '编译失败' : verdict === 'TLE' ? '整题测评超过服务器时间限制' : 'Judge0 执行失败：' + description;
-  return { status: verdict, message, stderr: compileOutput || serviceStderr || result.message || description, results: null, elapsedMs: Math.round(performance.now() - started) };
+  return { status: verdict, message, stderr: compileOutput || serviceStderr || result.message || description, results: null, elapsedMs: Math.round(performance.now() - started), timings, serverTime: result.time || null, serverWallTime: result.wall_time || null };
  }
 
  const output = atelierJudge0DecodeBase64(result.stdout);
@@ -305,7 +335,8 @@ async function atelierJudge0Run(data, signal) {
    stdout: first.stdout,
    stderr: first.stderr,
    timeMs: first.timeMs,
-   elapsedMs: Math.round(performance.now() - started)
+   elapsedMs: Math.round(performance.now() - started),
+   timings, serverTime: result.time || null, serverWallTime: result.wall_time || null
   };
  }
  const passed = results.filter(item => item.status === 'AC').length;
@@ -313,10 +344,35 @@ async function atelierJudge0Run(data, signal) {
   status: passed === results.length ? 'AC' : 'FAILED',
   passed, total: results.length, results,
   elapsedMs: Math.round(performance.now() - started),
+  timings,
   serverTime: result.time || null,
   serverWallTime: result.wall_time || null
  };
 }
+
+
+const atelierJudge0OriginalShowResult = showResult;
+showResult = function(result, action) {
+ atelierJudge0OriginalShowResult(result, action);
+ if (!result || !result.timings) return;
+ const seconds = value => (Number(value || 0) / 1000).toFixed(2) + 's';
+ const t = result.timings;
+ if (action === 'submit') {
+  const details = [
+   '总耗时 ' + seconds(result.elapsedMs),
+   '打包 ' + seconds(t.archiveMs),
+   '提交 ' + seconds(t.submitMs),
+   '等待 ' + seconds(t.pollMs)
+  ];
+  if (t.queueWaitMs !== null) details.push('排队约 ' + seconds(t.queueWaitMs));
+  if (t.executionWaitMs !== null) details.push('执行等待约 ' + seconds(t.executionWaitMs));
+  if (result.serverWallTime !== null) details.push('服务端 wall ' + result.serverWallTime + 's');
+  $('judgeSummary').textContent += ' · ' + details.join(' / ');
+  $('judgeSummary').title = details.join('\n') + ' · 轮询 ' + t.polls + ' 次';
+ } else {
+  $('runStatus').textContent += ' · 总耗时 ' + seconds(result.elapsedMs);
+ }
+};
 
 const atelierWandboxFallback = wandboxRun;
 wandboxRun = atelierJudge0Run;
