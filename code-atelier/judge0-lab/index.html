@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f5f1">
+<title>Judge0 迁移实验室 · Code Atelier</title>
+<style>
+:root{color-scheme:light;--bg:#f4f5f1;--paper:#fff;--ink:#1e2723;--muted:#68736d;--line:#dfe5df;--green:#28634d;--green-soft:#e8f1eb;--amber:#8a5a18;--amber-soft:#fbf1df;--red:#9c3838;--red-soft:#f8e9e7;--shadow:0 12px 34px rgba(31,49,39,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Inter,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1050px;margin:0 auto;padding:34px 20px 64px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:12px;letter-spacing:.12em;font-weight:700}.tag{border:1px solid #d9c59e;background:var(--amber-soft);color:var(--amber);border-radius:99px;padding:5px 10px;letter-spacing:0}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.12;letter-spacing:-.04em;margin:26px 0 10px}h2{font-size:18px;margin:0 0 12px;letter-spacing:-.02em}p{margin:0;color:var(--muted)}.intro{max-width:760px;font-size:16px}
+.notice{margin:22px 0;padding:14px 16px;border:1px solid #e6d8b8;background:#fffaf0;border-radius:14px;color:#735321;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 22px}.metric,.panel{background:var(--paper);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.metric{padding:14px}.metric small{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;margin-top:4px;font-size:15px}.metric em{font-style:normal;color:var(--muted);font-size:12px}
+.panel{padding:20px;margin:14px 0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.sub{font-size:12px;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}input,textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:#fbfcfa;color:var(--ink);padding:11px 12px;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}textarea{min-height:210px;resize:vertical;tab-size:4}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}button{border:0;border-radius:10px;padding:11px 16px;background:var(--green);color:white;font-weight:700;cursor:pointer}button.secondary{background:#edf1ed;color:#34453b;border:1px solid var(--line)}button:disabled{opacity:.5;cursor:wait}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.04em}td code{white-space:pre-wrap;color:#34453b}
+.pill{display:inline-block;border-radius:99px;padding:3px 8px;font-size:11px;font-weight:750;background:#edf1ed;color:#4d5a52}.pill.ok{background:var(--green-soft);color:var(--green)}.pill.bad{background:var(--red-soft);color:var(--red)}.pill.wait{background:var(--amber-soft);color:var(--amber)}
+.statusline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dot{width:8px;height:8px;border-radius:50%;background:#aab4ad}.dot.ok{background:#29945f}.dot.bad{background:#c34d43}.dot.wait{background:#d39a3d}
+pre{margin:0;padding:14px;border-radius:12px;background:#17231e;color:#dce9df;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.progress{height:7px;border-radius:99px;background:#edf1ed;overflow:hidden;margin:12px 0}.progress>span{display:block;height:100%;width:0;background:#3e8b65;transition:width .2s}
+.foot{font-size:12px;color:var(--muted);margin-top:18px}.hidden{display:none}
+@media(max-width:720px){main{padding:22px 13px 48px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row{grid-template-columns:1fr}.panel{padding:15px}table{font-size:12px}th,td{padding:8px 5px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><span>CODE ATELIER / EXPERIMENT 01</span><span class="tag">独立实验 · 不接入正式判题</span></div>
+  <h1>Judge0 迁移实验室</h1>
+  <p class="intro">验证 Judge0 公共 CE API 的可访问性、浏览器 CORS、C++17 编译，以及 Multi-file Program 的“一次编译、多组独立运行”。同时用同一份代码和测试数据对比当前 Wandbox 流程。</p>
+  <div class="notice"><strong>实验说明：</strong>本页面是独立测试页，不会修改 Code Atelier 正式网站的判题入口。实验代码会发送到第三方公共执行服务；请只使用无敏感信息的测试代码。公共服务可能排队、限流或临时不可用，不提供稳定性保证。</div>
+
+  <div class="grid">
+    <div class="metric"><small>Judge0 API</small><strong id="j0State">尚未检测</strong><em id="j0Meta">ce.judge0.com</em></div>
+    <div class="metric"><small>Wandbox API</small><strong id="wbState">尚未检测</strong><em id="wbMeta">wandbox.org</em></div>
+    <div class="metric"><small>C++17</small><strong id="cppState">尚未检测</strong><em id="cppMeta">GCC 编译器</em></div>
+    <div class="metric"><small>Multi-file</small><strong id="multiState">尚未检测</strong><em id="multiMeta">语言 ID 89</em></div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head"><h2>01 / 实验配置</h2><span class="sub">公共 API · 无需填写密钥</span></div>
+    <div class="row">
+      <div><label for="judge0Base">Judge0 CE API 地址</label><input id="judge0Base" value="https://ce.judge0.com" spellcheck="false"></div>
+      <div><label for="wandboxBase">Wandbox API 地址</label><input id="wandboxBase" value="https://wandbox.org/api" spellcheck="false"></div>
+    </div>
+    <p class="foot">POST 使用 application/json，会触发浏览器 CORS 预检。POST 成功并拿到 token，才算浏览器跨域提交验证通过。</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>02 / C++17 测试程序</h2><span class="sub">可编辑 · 四组固定输入</span></div>
+    <label for="source">main.cpp</label>
+    <textarea id="source" spellcheck="false">#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    long long a, b;
+    if (!(cin >> a >> b)) return 0;
+    cout << a + b << '\n';
+    return 0;
+}</textarea>
+    <div style="overflow-x:auto;margin-top:12px">
+      <table>
+        <thead><tr><th>用例</th><th>标准输入</th><th>预期输出</th><th>覆盖点</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td><code>1 2</code></td><td><code>3</code></td><td>普通正数</td></tr>
+          <tr><td>02</td><td><code>-4 9</code></td><td><code>5</code></td><td>负数</td></tr>
+          <tr><td>03</td><td><code>0 0</code></td><td><code>0</code></td><td>零边界</td></tr>
+          <tr><td>04</td><td><code>1000000000 2000000000</code></td><td><code>3000000000</code></td><td>long long</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="btns">
+      <button id="checkBtn" class="secondary">仅检查 API / CORS</button>
+      <button id="runBtn">运行完整实验与耗时对比</button>
+    </div>
+    <div class="progress"><span id="progressBar"></span></div>
+    <div class="statusline"><span class="dot" id="runDot"></span><span id="runStatus" class="sub">等待开始</span></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>03 / 耗时对比</h2><span class="sub">浏览器端到端实测 · 含网络与排队</span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>方案</th><th>提交次数</th><th>耗时</th><th>通过</th><th>说明</th></tr></thead>
+        <tbody id="resultRows"><tr><td colspan="5" class="sub">完成实验后显示结果。</td></tr></tbody>
+      </table>
+    </div>
+    <p class="foot">Wandbox 基线模拟当前网站流程：先完成第 1 组，再并发执行剩余 3 组；每组都会重新编译。Judge0 Multi-file 只提交一次，由 compile 脚本编译一次，再由 run 脚本启动四个独立进程。</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>04 / 逐组结果与诊断</h2><span class="sub">AC / WA / CE / RE / TLE</span></div>
+    <div id="caseResults" class="sub">尚无测评结果。</div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>05 / 实验日志</h2><span class="sub">记录 HTTP 状态、CORS 和轮询情况</span></div>
+    <pre id="log">实验页已就绪。点击“仅检查 API / CORS”或“运行完整实验”开始。</pre>
+  </section>
+  <p class="foot">Code Atelier · Judge0 Lab · 独立验证页。公共服务的测试结果只代表本次网络、浏览器和服务负载情况，不代表长期 SLA。</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const TESTS=[
+ {name:"01",input:"1 2\n",expected:"3\n"},
+ {name:"02",input:"-4 9\n",expected:"5\n"},
+ {name:"03",input:"0 0\n",expected:"0\n"},
+ {name:"04",input:"1000000000 2000000000\n",expected:"3000000000\n"}
+];
+const J0_MULTI_ID=89;
+let judgeCpp=null,judgeMulti=null,wandboxCpp=null,busy=false;
+function log(message){
+ const el=$("log");
+ const stamp=new Date().toLocaleTimeString();
+ el.textContent+="\n["+stamp+"] "+message;
+ el.scrollTop=el.scrollHeight;
+}
+function setCard(id,text,kind,meta){
+ $(id).textContent=text;
+ const dotClass=kind==="ok"?"ok":kind==="bad"?"bad":kind==="wait"?"wait":"";
+ $(id).style.color=kind==="ok"?"#28634d":kind==="bad"?"#9c3838":kind==="wait"?"#8a5a18":"";
+ const metaId=id==="j0State"?"j0Meta":id==="wbState"?"wbMeta":id==="cppState"?"cppMeta":"multiMeta";
+ if(meta!==undefined)$(metaId).textContent=meta;
+}
+function setProgress(value,message){
+ $("progressBar").style.width=Math.max(0,Math.min(100,value))+"%";
+ $("runStatus").textContent=message;
+}
+function setBusy(value){
+ busy=value;
+ $("checkBtn").disabled=value;
+ $("runBtn").disabled=value;
+}
+function apiBase(id){
+ return $(id).value.trim().replace(/\/+$/,"");
+}
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function fetchJson(url,options,timeoutMs){
+ const started=performance.now();
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeoutMs||25000);
+ let response,text,data;
+ try{
+  response=await fetch(url,Object.assign({mode:"cors",credentials:"omit",signal:controller.signal},options||{}));
+  text=await response.text();
+ }catch(error){
+  if(error&&error.name==="AbortError")throw new Error("请求超时："+url);
+  throw new Error("浏览器请求失败："+String(error&&error.message||error)+"。可能是 CORS、网络连接或公共服务不可用。");
+ }finally{clearTimeout(timer);}
+ try{data=text?JSON.parse(text):{};}catch(_){data={raw:text};}
+ if(!response.ok)throw new Error("HTTP "+response.status+"："+String(text).slice(0,500));
+ return {data:data,ms:performance.now()-started,status:response.status};
+}
+function normalize(text){
+ return String(text==null?"":text).replace(/\r\n/g,"\n").trim().split(/\s+/).filter(Boolean).join(" ");
+}
+function decodeB64(value){
+ if(!value)return "";
+ const binary=atob(String(value).replace(/\s/g,""));
+ const bytes=new Uint8Array(binary.length);
+ for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+ return new TextDecoder("utf-8").decode(bytes);
+}
+function classify(exitCode,stdout,expected){
+ if(exitCode===124||exitCode===137)return "TLE";
+ if(exitCode!==0)return "RE";
+ return normalize(stdout)===normalize(expected)?"AC":"WA";
+}
+async function checkApis(){
+ log("检查 Judge0 GET /languages …");
+ const j=await fetchJson(apiBase("judge0Base")+"/languages",{},20000);
+ if(!Array.isArray(j.data))throw new Error("Judge0 /languages 返回格式异常");
+ judgeCpp=j.data.find(x=>x.id===105)||j.data.find(x=>/^C\+\+ \(GCC/.test(x.name||""))||j.data.find(x=>/^C\+\+/.test(x.name||""));
+ judgeMulti=j.data.find(x=>x.id===J0_MULTI_ID);
+ setCard("j0State","GET 可访问","ok","HTTP "+j.status+" · "+j.ms.toFixed(0)+" ms");
+ if(judgeCpp){
+  setCard("cppState","已发现","ok","ID "+judgeCpp.id+" · "+judgeCpp.name);
+ }else{
+  setCard("cppState","未找到 C++","bad","/languages 中没有 C++ 编译器");
+ }
+ if(judgeMulti){
+  setCard("multiState","已发现","ok","ID "+judgeMulti.id+" · "+judgeMulti.name);
+ }else{
+  setCard("multiState","未找到","bad","公共实例未提供语言 ID 89");
+ }
+ log("Judge0 /languages：HTTP "+j.status+"，"+j.data.length+" 个语言，"+j.ms.toFixed(0)+" ms");
+ log("C++ 编译器："+(judgeCpp?judgeCpp.name+"（ID "+judgeCpp.id+"）":"未找到"));
+ log("Multi-file："+(judgeMulti?"可用（ID 89）":"不可用"));
+ log("检查 Wandbox GET /list.json …");
+ const w=await fetchJson(apiBase("wandboxBase")+"/list.json",{},20000);
+ if(!Array.isArray(w.data))throw new Error("Wandbox /list.json 返回格式异常");
+ wandboxCpp=w.data.find(x=>x.language==="C++"&&x.name==="gcc-head")||w.data.find(x=>x.language==="C++"&&/gcc/.test(x.name||""))||w.data.find(x=>x.language==="C++");
+ setCard("wbState","GET 可访问","ok","HTTP "+w.status+" · "+w.ms.toFixed(0)+" ms");
+ log("Wandbox /list.json：HTTP "+w.status+"，"+w.data.length+" 个编译器，"+w.ms.toFixed(0)+" ms");
+ log("Wandbox C++ 编译器："+(wandboxCpp?wandboxCpp.name+"（"+wandboxCpp.version+"）":"未找到"));
+ return {judge0:j,wandbox:w};
+}
+async function submitJudge0(payload){
+ const result=await fetchJson(apiBase("judge0Base")+"/submissions?base64_encoded=false",{
+  method:"POST",
+  headers:{"Content-Type":"application/json","Accept":"application/json"},
+  body:JSON.stringify(payload)
+ },30000);
+ if(!result.data||!result.data.token)throw new Error("Judge0 未返回 submission token："+JSON.stringify(result.data));
+ log("Judge0 POST 成功：HTTP "+result.status+"，CORS 预检通过，token 已取得（"+result.ms.toFixed(0)+" ms）");
+ return {token:result.data.token,requestMs:result.ms};
+}
+async function pollJudge0(token,label){
+ const fields="token,status,stdout,stderr,compile_output,message,exit_code,time,wall_time,memory";
+ const url=apiBase("judge0Base")+"/submissions/"+encodeURIComponent(token)+"?base64_encoded=true&fields="+encodeURIComponent(fields);
+ const started=performance.now();
+ let polls=0;
+ while(performance.now()-started<90000){
+  const r=await fetchJson(url,{},20000);
+  polls++;
+  const status=r.data.status||{};
+  if(status.id!==1&&status.id!==2){
+   log(label+" 完成："+(status.description||status.id)+"，轮询 "+polls+" 次，服务端 wall_time "+(r.data.wall_time||"—")+" s");
+   return Object.assign({},r.data,{polls:polls,clientWaitMs:performance.now()-started});
+  }
+  setProgress(0,label+"："+(status.description||"排队中")+" · 已轮询 "+polls+" 次");
+  await sleep(650);
+ }
+ throw new Error(label+" 等待 Judge0 结果超过 90 秒");
+}
+async function runJudge0CppSmoke(){
+ if(!judgeCpp)throw new Error("没有找到 Judge0 C++ 编译器");
+ const code="#include <iostream>\nusing namespace std;\nint main(){ cout << \"JUDGE0_CPP17_OK\\\\n\"; return 0; }\n";
+ const payload={language_id:judgeCpp.id,source_code:code,compiler_options:"-std=c++17 -O2",stdin:"",expected_output:"JUDGE0_CPP17_OK\n"};
+ const submitted=await submitJudge0(payload);
+ const result=await pollJudge0(submitted.token,"Judge0 C++17 单文件验证");
+ const status=result.status||{};
+ const ok=status.id===3;
+ setCard("cppState",ok?"POST / C++17 通过":"C++17 执行失败",ok?"ok":"bad",status.description||"status "+status.id);
+ log("Judge0 C++17 smoke："+(ok?"通过":"失败")+"；status="+status.id+" "+(status.description||""));
+ if(!ok)log("C++17 诊断："+decodeB64(result.compile_output)||decodeB64(result.stderr)||result.message||"无额外错误信息");
+ return ok;
+}
+async function runWandboxCase(code,test){
+ const payload={
+  compiler:wandboxCpp.name,
+  code:code,
+  stdin:test.input,
+  "compiler-option-raw":"-std=c++17\n-O2\n-pipe\n-Wall\n-Wextra",
+  save:false
+ };
+ const r=await fetchJson(apiBase("wandboxBase")+"/compile.json",{
+  method:"POST",
+  headers:{"Content-Type":"application/json","Accept":"application/json"},
+  body:JSON.stringify(payload)
+ },45000);
+ const result=r.data||{};
+ const compileText=String(result.compiler_output||"")+String(result.compiler_error||"");
+ const stdout=String(result.program_output||"");
+ const exitCode=Number(result.status);
+ let verdict;
+ if(compileText&&String(result.status)!=="0"&&!stdout)verdict="CE";
+ else if(result.signal&&/XCPU|KILL|ALRM/i.test(result.signal))verdict="TLE";
+ else verdict=classify(exitCode,stdout,test.expected);
+ return {name:test.name,verdict:verdict,stdout:stdout,stderr:String(result.program_error||""),compile:compileText,requestMs:r.ms,exitCode:exitCode};
+}
+async function runWandboxBaseline(code){
+ const started=performance.now();
+ log("开始 Wandbox 基线：先运行第 1 组，再并发运行其余 3 组（共 4 次编译请求）…");
+ const first=await runWandboxCase(code,TESTS[0]);
+ const rest=await Promise.all(TESTS.slice(1).map(test=>runWandboxCase(code,test)));
+ const results=[first].concat(rest);
+ return {name:"Wandbox（当前流程模拟）",requests:4,elapsed:performance.now()-started,results,passed:results.filter(x=>x.verdict==="AC").length};
+}
+function crc32(bytes){
+ let crc=0xffffffff;
+ for(let i=0;i<bytes.length;i++){
+  crc^=bytes[i];
+  for(let j=0;j<8;j++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);
+ }
+ return (crc^0xffffffff)>>>0;
+}
+function concatBytes(parts){
+ let size=0;for(const p of parts)size+=p.length;
+ const out=new Uint8Array(size);let offset=0;
+ for(const p of parts){out.set(p,offset);offset+=p.length;}
+ return out;
+}
+function makeZip(files){
+ const encoder=new TextEncoder(),locals=[],centrals=[];
+ const now=new Date();
+ const dosTime=(now.getHours()<<11)|(now.getMinutes()<<5)|Math.floor(now.getSeconds()/2);
+ const dosDate=((Math.max(1980,now.getFullYear())-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate();
+ let offset=0;
+ for(const file of files){
+  const name=encoder.encode(file.name),data=typeof file.content==="string"?encoder.encode(file.content):file.content;
+  const crc=crc32(data);
+  const local=new Uint8Array(30+name.length+data.length),ld=new DataView(local.buffer);
+  ld.setUint32(0,0x04034b50,true);ld.setUint16(4,20,true);ld.setUint16(6,0x0800,true);ld.setUint16(8,0,true);
+  ld.setUint16(10,dosTime,true);ld.setUint16(12,dosDate,true);ld.setUint32(14,crc,true);
+  ld.setUint32(18,data.length,true);ld.setUint32(22,data.length,true);ld.setUint16(26,name.length,true);ld.setUint16(28,0,true);
+  local.set(name,30);local.set(data,30+name.length);locals.push(local);
+  const central=new Uint8Array(46+name.length),cd=new DataView(central.buffer);
+  cd.setUint32(0,0x02014b50,true);cd.setUint16(4,0x0314,true);cd.setUint16(6,20,true);cd.setUint16(8,0x0800,true);cd.setUint16(10,0,true);
+  cd.setUint16(12,dosTime,true);cd.setUint16(14,dosDate,true);cd.setUint32(16,crc,true);
+  cd.setUint32(20,data.length,true);cd.setUint32(24,data.length,true);cd.setUint16(28,name.length,true);
+  cd.setUint16(30,0,true);cd.setUint16(32,0,true);cd.setUint16(34,0,true);cd.setUint16(36,0,true);
+  cd.setUint32(38,((file.executable?0o100755:0o100644)*65536)>>>0,true);cd.setUint32(42,offset,true);
+  central.set(name,46);centrals.push(central);
+  offset+=local.length;
+ }
+ const centralBytes=concatBytes(centrals),localBytes=concatBytes(locals);
+ const end=new Uint8Array(22),ed=new DataView(end.buffer);
+ ed.setUint32(0,0x06054b50,true);ed.setUint16(4,0,true);ed.setUint16(6,0,true);
+ ed.setUint16(8,files.length,true);ed.setUint16(10,files.length,true);
+ ed.setUint32(12,centralBytes.length,true);ed.setUint32(16,localBytes.length,true);ed.setUint16(20,0,true);
+ return concatBytes([localBytes,centralBytes,end]);
+}
+function bytesToBase64(bytes){
+ let binary="";
+ const step=0x8000;
+ for(let i=0;i<bytes.length;i+=step)binary+=String.fromCharCode.apply(null,bytes.subarray(i,Math.min(i+step,bytes.length)));
+ return btoa(binary);
+}
+function makeMultiZip(code){
+ const compile="#!/bin/bash\nset -euo pipefail\ng++ -std=c++17 -O2 -pipe -Wall -Wextra main.cpp -o main\n";
+ const run=[
+  "#!/bin/bash",
+  "set +e",
+  "tmp_dir=$(mktemp -d)",
+  "trap 'rm -rf \"$tmp_dir\"' EXIT",
+  "for input_file in tests/*.in; do",
+  "  [ -f \"$input_file\" ] || continue",
+  "  case_id=$(basename \"$input_file\" .in)",
+  "  timeout 2s ./main < \"$input_file\" > \"$tmp_dir/out\" 2> \"$tmp_dir/err\"",
+  "  exit_code=$?",
+  "  if [ \"$exit_code\" -eq 137 ]; then exit_code=124; fi",
+  "  printf 'ATELIER_CASE|%s|%s|' \"$case_id\" \"$exit_code\"",
+  "  base64 -w 0 \"$tmp_dir/out\"",
+  "  printf '|'",
+  "  base64 -w 0 \"$tmp_dir/err\"",
+  "  printf '\\n'",
+  "done",
+  "exit 0",
+  ""
+ ].join("\n");
+ const files=[
+  {name:"main.cpp",content:code},
+  {name:"compile",content:compile,executable:true},
+  {name:"run",content:run,executable:true}
+ ];
+ TESTS.forEach(test=>files.push({name:"tests/"+test.name+".in",content:test.input}));
+ return bytesToBase64(makeZip(files));
+}
+function parseMultiOutput(stdout){
+ const rows=[];
+ String(stdout||"").split(/\r?\n/).forEach(line=>{
+  const p=line.split("|");
+  if(p.length>=5&&p[0]==="ATELIER_CASE"){
+   const exitCode=Number(p[2]);
+   rows.push({name:p[1],exitCode:exitCode,stdout:decodeB64(p[3]),stderr:decodeB64(p[4])});
+  }
+ });
+ return rows;
+}
+async function runJudge0Multi(code){
+ if(!judgeMulti)throw new Error("Judge0 公共实例没有暴露 Multi-file Program（ID 89）");
+ const zip=makeMultiZip(code);
+ log("Multi-file ZIP 已生成："+Math.round(zip.length*0.75)+" bytes（Base64 后 "+zip.length+" 字符）");
+ const submitted=await submitJudge0({language_id:J0_MULTI_ID,additional_files:zip});
+ const result=await pollJudge0(submitted.token,"Judge0 Multi-file（一次编译、四组运行）");
+ const status=result.status||{};
+ if(status.id!==3){
+  const diagnostic=decodeB64(result.compile_output)||decodeB64(result.stderr)||result.message||status.description||"未知错误";
+  throw new Error("Multi-file 任务失败："+status.description+"；"+diagnostic);
+ }
+ const parsed=parseMultiOutput(decodeB64(result.stdout));
+ const results=parsed.map(row=>{
+  const test=TESTS.find(x=>x.name===row.name);
+  return Object.assign({},row,{verdict:test?classify(row.exitCode,row.stdout,test.expected):"IE"});
+ });
+ return {name:"Judge0 Multi-file",requests:1,elapsed:result.clientWaitMs,results,passed:results.filter(x=>x.verdict==="AC").length,serverTime:result.time,serverWall:result.wall_time,compileOutput:decodeB64(result.compile_output)};
+}
+function renderCases(groups){
+ const all=[];
+ groups.forEach(group=>group.results.forEach(r=>all.push({group:group.name,result:r})));
+ if(!all.length){$("caseResults").textContent="没有可展示的逐组结果。";return;}
+ const table=document.createElement("table");
+ table.innerHTML="<thead><tr><th>方案</th><th>用例</th><th>判定</th><th>实际输出</th><th>错误信息</th></tr></thead>";
+ const body=document.createElement("tbody");
+ all.forEach(item=>{
+  const r=item.result,tr=document.createElement("tr");
+  const values=[item.group,r.name,r.verdict,r.stdout||"（空）",r.stderr||r.compile||""];
+  values.forEach((value,index)=>{
+   const td=document.createElement("td");
+   if(index===2){const span=document.createElement("span");span.className="pill "+(value==="AC"?"ok":value==="WA"?"bad":"wait");span.textContent=value;td.appendChild(span);}
+   else if(index>=3){const code=document.createElement("code");code.textContent=String(value).slice(0,500);td.appendChild(code);}
+   else td.textContent=value;
+   tr.appendChild(td);
+  });
+  body.appendChild(tr);
+ });
+ table.appendChild(body);
+ $("caseResults").innerHTML="";
+ $("caseResults").appendChild(table);
+}
+function renderSummary(groups){
+ const rows=groups.map(g=>"<tr><td>"+g.name+"</td><td>"+g.requests+"</td><td>"+g.elapsed.toFixed(0)+" ms</td><td>"+g.passed+"/"+g.results.length+"</td><td>"+(g.name.indexOf("Wandbox")>=0?"每个测试独立编译运行":"一个 Multi-file submission；compile 脚本只编译一次")+"</td></tr>").join("");
+ $("resultRows").innerHTML=rows||'<tr><td colspan="5">暂无结果</td></tr>';
+}
+async function runCheckOnly(){
+ setBusy(true);$("log").textContent="";
+ try{
+  setProgress(15,"正在检查 Judge0 和 Wandbox API…");
+  await checkApis();
+  setProgress(100,"API GET 检查完成。要验证 CORS POST 和 C++17，请运行完整实验。");
+  $("runDot").className="dot ok";
+  log("GET 检查完成。注意：GET 成功不等于 POST CORS 一定成功；完整实验会发起 JSON POST 预检。");
+ }catch(error){
+  $("runDot").className="dot bad";setProgress(0,"检查失败："+error.message);log("错误："+error.message);
+ }finally{setBusy(false);}
+}
+async function runFull(){
+ if(busy)return;
+ setBusy(true);$("log").textContent="开始实验…";$("resultRows").innerHTML='<tr><td colspan="5">正在执行…</td></tr>';$("caseResults").textContent="正在等待结果…";
+ const groups=[];
+ try{
+  setProgress(5,"第 1 步：检查公共 API…");
+  await checkApis();
+  if(!judgeCpp)throw new Error("Judge0 没有可用的 C++ 编译器，无法验证 C++17");
+  if(!wandboxCpp)throw new Error("Wandbox 没有可用的 C++ 编译器，无法进行当前流程对比");
+  setProgress(15,"第 2 步：验证 Judge0 C++17 和浏览器 POST CORS…");
+  const smokeOk=await runJudge0CppSmoke();
+  if(!smokeOk)throw new Error("Judge0 C++17 单文件验证未通过；请查看日志。");
+  setProgress(30,"第 3 步：运行 Wandbox 基线（4 次编译运行）…");
+  const wb=await runWandboxBaseline($("source").value);
+  groups.push(wb);renderSummary(groups);renderCases(groups);
+  log("Wandbox 基线："+wb.passed+"/"+wb.results.length+" 通过，端到端 "+wb.elapsed.toFixed(0)+" ms");
+  setProgress(65,"第 4 步：运行 Judge0 Multi-file（1 次提交）…");
+  const multi=await runJudge0Multi($("source").value);
+  groups.push(multi);renderSummary(groups);renderCases(groups);
+  log("Judge0 Multi-file："+multi.passed+"/"+multi.results.length+" 通过，端到端 "+multi.elapsed.toFixed(0)+" ms");
+  const faster=wb.elapsed-multi.elapsed;
+  const pct=wb.elapsed>0?faster/wb.elapsed*100:0;
+  if(multi.passed===TESTS.length&&wb.passed===TESTS.length){
+   setProgress(100,"实验完成：两种方案均通过全部用例。");
+   $("runDot").className="dot ok";
+   log("对比结论："+(faster>0?"Judge0 Multi-file 快 "+faster.toFixed(0)+" ms（"+pct.toFixed(1)+"%）":"本次 Judge0 Multi-file 未更快，差值 "+Math.abs(faster).toFixed(0)+" ms")+"。单次结果受公共队列和网络波动影响，建议重复 3 次取中位数。");
+  }else{
+   setProgress(100,"实验完成，但存在未通过用例；请查看逐组结果。");
+   $("runDot").className="dot wait";
+  }
+ }catch(error){
+  $("runDot").className="dot bad";
+  setProgress(0,"实验中断："+error.message);
+  log("实验中断："+error.message);
+ }finally{
+  if(groups.length)renderCases(groups);
+  setBusy(false);
+ }
+}
+$("checkBtn").addEventListener("click",runCheckOnly);
+$("runBtn").addEventListener("click",runFull);
+})();
+</script>
+</body>
+</html>
