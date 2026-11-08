@@ -63,9 +63,9 @@ details{border-top:1px solid var(--line);padding:10px 0}details summary{cursor:p
 <div class="title-row"><div><div class="eyebrow">Problem</div><h2 id="title">选择一道题目开始练习</h2><div class="meta" id="meta"></div></div></div>
 <div id="statement"><p class="lead">从左侧题目列表中选择一道题目。每道题都包含完整输入输出说明和配套测评数据。</p></div>
 <div class="editor" id="editor" hidden>
-<div class="editor-head"><div><strong>在线编程与测评</strong><div class="small">先独立完成代码，再运行样例或提交全部测试。</div></div><div class="editor-tools"><select id="language"><option value="c">C11</option><option value="cpp">C++17</option><option value="python">Python 3</option></select><button class="btn" id="reset">重置代码</button><button class="btn" id="runSample">运行样例</button><button class="btn primary" id="submit">提交测评</button></div></div>
+<div class="editor-head"><div><strong>在线编程与测评</strong><div class="small">先独立完成代码，再运行样例或提交全部测试。</div></div><div class="editor-tools"><select id="language"><option value="c">C11</option><option value="cpp">C++17</option><option value="python">Python 3</option></select><button class="btn" id="reset">重置代码</button><button class="btn" id="copySample">复制样例输入</button><button class="btn" id="runSample">运行样例</button><button class="btn primary" id="submit">提交测评</button></div></div>
 <textarea id="code" aria-label="代码编辑器" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-<div class="small" style="margin-top:7px">代码按题目和语言自动保存在当前浏览器；通过记录也保存在本地，不会云同步。运行时，代码和测试输入会发送到第三方 Wandbox 编译运行服务；请勿提交密码、隐私或密钥。服务可能限流或暂时不可用。</div>
+<div class="small" style="margin-top:7px">代码按题目和语言自动保存在当前浏览器；通过记录也保存在本地，不会云同步。快捷键：Ctrl/⌘ + Enter 提交全部测试，Ctrl/⌘ + Shift + Enter 运行样例。运行时，代码和测试输入会发送到第三方 Wandbox 编译运行服务；请勿提交密码、隐私或密钥。服务可能限流或暂时不可用。</div>
 <div class="result" id="result" aria-live="polite" role="status">等待运行。选择 C / C++ / Python 后，点击“运行样例”或“提交测评”。</div>
 <details id="allCases"><summary>查看本题全部公开测评数据（含预期输出）</summary><div id="caseList"></div></details>
 </div>
@@ -166,9 +166,8 @@ function renderProblem(p){
 function selectProblem(id){if(running)return;saveCode();current=problems.find(p=>p.id===id);if(!current)return;renderProblem(current);}
 $('language').addEventListener('change',()=>{const next=$('language').value;if(current){saveCode();$('code').value=getCode(current.id,next);}activeLanguage=next;});
 $('code').addEventListener('input',()=>{saveCode();if(current){clearPassed(current.id,activeLanguage);updateProgress();renderList();}});
-$('reset').addEventListener('click',()=>{if(!current)return;$('code').value=templates[activeLanguage];saveCode();clearPassed(current.id,activeLanguage);updateProgress();renderList();});
+$('reset').addEventListener('click',()=>{if(!current)return;if($('code').value!==templates[activeLanguage]&&!confirm('重置会覆盖当前语言下保存的代码，确定继续吗？'))return;$('code').value=templates[activeLanguage];saveCode();clearPassed(current.id,activeLanguage);updateProgress();renderList();});
 [search,year,topic,progressFilter].forEach(x=>x.addEventListener('input',renderList));
-function norm(s){return String(s??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').map(x=>x.replace(/[ \t]+$/g,'')).join('\n').replace(/^\n+|\n+$/g,'');}
 async function fetchWithTimeout(url,options={},timeoutMs=30000){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
  try{return await fetch(url,{...options,signal:controller.signal});}
@@ -268,6 +267,8 @@ async function execute(mode){
   running=false;$('submit').disabled=false;$('runSample').disabled=false;$('code').disabled=false;$('language').disabled=false;$('reset').disabled=false;renderList();
  }
 }
+$('copySample').addEventListener('click',async()=>{if(!current)return;const sample=(cases[current.id]||[])[0];if(!sample){$('result').textContent='本题暂无样例输入。';return;}try{if(!navigator.clipboard?.writeText)throw new Error('当前浏览器不支持剪贴板 API');await navigator.clipboard.writeText(sample[0]);$('result').textContent='样例输入已复制。';}catch(e){$('result').textContent='复制失败，请展开“查看本题全部公开测评数据”后手动复制样例输入。';}});
+document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.key!=='Enter'||e.target!==$('code'))return;e.preventDefault();if(running)return;execute(e.shiftKey?'sample':'all');});
 $('runSample').addEventListener('click',()=>execute('sample'));
 $('submit').addEventListener('click',()=>execute('all'));
 initFilters();renderList();selectProblem(problems[0].id);
