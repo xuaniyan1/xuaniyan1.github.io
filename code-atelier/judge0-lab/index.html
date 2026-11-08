@@ -229,7 +229,7 @@ async function pollJudge0(token,label){
 }
 async function runJudge0CppSmoke(){
  if(!judgeCpp)throw new Error("没有找到 Judge0 C++ 编译器");
- const code="#include <iostream>\nusing namespace std;\nint main(){ cout << \"JUDGE0_CPP17_OK\\\\n\"; return 0; }\n";
+ const code="#include <iostream>\nusing namespace std;\nint main(){ cout << \"JUDGE0_CPP17_OK\\n\"; return 0; }\n";
  const payload={language_id:judgeCpp.id,source_code:code,compiler_options:"-std=c++17 -O2",stdin:"",expected_output:"JUDGE0_CPP17_OK\n"};
  const submitted=await submitJudge0(payload);
  const result=await pollJudge0(submitted.token,"Judge0 C++17 单文件验证");
