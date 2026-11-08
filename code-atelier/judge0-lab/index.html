@@ -71,7 +71,7 @@ int main() {
       </table>
     </div>
     <div class="btns">
-      <button id="checkBtn" class="secondary">仅检查 API / CORS</button>
+      <button id="checkBtn" class="secondary">仅检查 API 可用性</button>
       <button id="runBtn">运行完整实验与耗时对比</button>
     </div>
     <div class="progress"><span id="progressBar"></span></div>
@@ -177,8 +177,9 @@ async function checkApis(){
   j=await fetchJson(apiBase("judge0Base")+"/languages",{},20000);
   if(!Array.isArray(j.data))throw new Error("Judge0 /languages 返回格式异常");
   judgeCpp=j.data.find(x=>x.id===105)||j.data.find(x=>/^C\+\+ \(GCC/.test(x.name||""))||j.data.find(x=>/^C\+\+/.test(x.name||""));
-  judgeMulti=j.data.find(x=>x.id===J0_MULTI_ID);
+  const multiLanguage=j.data.find(x=>x.id===J0_MULTI_ID);
   cfg=(await fetchJson(apiBase("judge0Base")+"/config_info",{},20000)).data;
+  judgeMulti=cfg.enable_additional_files===true?multiLanguage:null;
   setCard("j0State","GET 可访问","ok","HTTP "+j.status+" · "+j.ms.toFixed(0)+" ms");
   if(judgeCpp)setCard("cppState","已发现","ok","ID "+judgeCpp.id+" · "+judgeCpp.name);
   else setCard("cppState","未找到 C++","bad","/languages 中没有 C++ 编译器");
