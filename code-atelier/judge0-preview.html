@@ -31,6 +31,16 @@ if(!pack.worker.includes("runtime.globals.set('_atelier_code',data.code);runtime
 pack.worker=pack.worker.replace("runtime.globals.set('_atelier_code',data.code);runtime.globals.set('_atelier_input',data.tests[i].input);","runtime.globals.set('_atelier_input',data.tests[i].input);");
 if(!pack.worker.includes("exec(compile(_atelier_code, 'main.py', 'exec'),"))throw new Error('测评优化补丁未匹配到 Python 执行入口。');
 pack.worker=pack.worker.replace("exec(compile(_atelier_code, 'main.py', 'exec'),","exec(_atelier_compiled_code,");
+// Judge0 preview only: isolate drafts from production and replace only the C/C++ execution adapter.
+pack.js=pack.js.replace('正在连接在线 C / C++ 编译器…','正在连接 Judge0 在线判题服务…');
+pack.js=pack.js.replaceAll('atelier-v1','atelier-judge0-preview-v1');
+if(!pack.js.includes('async function wandboxRun(data,signal)')||!pack.js.includes('function warmExecutionEngine()'))throw new Error('Judge0 预览补丁未匹配到原判题函数。');
+const judge0RuntimeResponse=await fetch('./judge0-lab/judge0-runtime.js',{cache:'no-cache'});
+if(!judge0RuntimeResponse.ok)throw new Error('无法加载 Judge0 运行适配器（HTTP '+judge0RuntimeResponse.status+'）。');
+const judge0RuntimePatch=await judge0RuntimeResponse.text();
+new Function(judge0RuntimePatch);
+pack.js+='\n'+judge0RuntimePatch;
+document.title='Code Atelier · Judge0 迁移预览版';
 document.body.innerHTML=pack.body;
 const style=document.createElement('style');style.textContent=pack.css;document.head.appendChild(style);
 window.__ATELIER_PROBLEMS_GZIP__=pack.problems;
