@@ -113,7 +113,7 @@ if (!html.includes("c[2]||") || !html.includes("p.sampleLabel||")) {
 for (const required of ['id="sourceType"', 'id="sortOrder"', "function sourceGroup(", "function restoreLastProblem(", "value='recent'"]) {
   if (!html.includes(required)) throw new Error("Question bank provenance UX is missing: " + required);
 }
-if (!html.includes("2022年北航计算机学院预推免机试第二题.pdf")) {
+if (!html.includes("CS-BAOYAN-2022/pull/23/files") || !html.includes("2022 · 预推免机试第二题")) {
   throw new Error("Source PDF reference for 2022 pre-admission exam is missing.");
 }
 
