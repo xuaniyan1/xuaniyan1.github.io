@@ -164,6 +164,20 @@ for (const [index, test] of cases[circular.id].entries()) {
   }
 }
 
+// Fast checks are deliberately non-crediting, because public Wandbox compiles each case.
+for (const required of [
+ 'id="quickCheck"',
+ "mode==='quick'?cs.slice(0,4)",
+ "mode==='quick'",
+ "仅检查前 ",
+ "execute('quick')"
+]) {
+ if (!html.includes(required)) throw new Error("Non-crediting quick-check UX is missing: " + required);
+}
+if (!html.includes("if(completed===chosen.length&&passed===chosen.length)")) {
+ throw new Error("Full-pass completion logic was unexpectedly modified.");
+}
+
 // Test the original-source question archive's share links, without changing saved code keys.
 for (const required of ['id="copyQuestionLink"', 'function problemFromHash()', "window.addEventListener('hashchange'", 'navigator.clipboard.writeText(link)']) {
   if (!html.includes(required)) throw new Error("Question permalink support missing: " + required);
