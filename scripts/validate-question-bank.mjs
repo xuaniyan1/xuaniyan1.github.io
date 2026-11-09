@@ -62,7 +62,7 @@ for (const problem of problems) {
     if (typeof problem.sampleLabel !== "string" || !problem.sampleLabel.includes("训练")) {
       throw new Error(`408 training problem ${problem.id} must label its sample as a training sample.`);
     }
-    if (!String(problem.sampleNote || "").includes("不属于北航往年机试题")) {
+    if (!/(?:不属于北航往年机试题|不是北航历年机试原题|非北航历年真题)/.test(String(problem.sampleNote || ""))) {
       throw new Error(`408 training problem ${problem.id} must explain that it is not a historical exam question.`);
     }
   }
