@@ -60,7 +60,7 @@ details{border-top:1px solid var(--line);padding:10px 0}details summary{cursor:p
 <div class="layout">
 <aside class="sidebar"><div class="filters"><input id="search" aria-label="搜索题目" placeholder="搜索题目、年份、算法、标签"><select id="year" aria-label="按年份筛选"><option value="">全部年份</option></select><select id="category" aria-label="按算法大类筛选"><option value="">全部算法大类</option></select><select id="topic" aria-label="按具体知识点筛选"><option value="">全部知识点</option></select><select id="level" aria-label="按难度筛选"><option value="">全部难度</option></select><select id="progressFilter" aria-label="按通过状态筛选"><option value="">全部状态</option><option value="unsolved">尚未通过</option><option value="solved">已通过</option></select><select id="sourceType" aria-label="按题源类型筛选"><option value="">全部题源类型</option><option value="recollection">考生回忆／亲历资料</option><option value="published">公开完整题面整理</option><option value="reconstructed">参考代码／题解重建</option><option value="undated">年份尚待核验</option></select><select id="sortOrder" aria-label="题目排序方式"><option value="newest">近年优先</option><option value="oldest">早年优先</option><option value="title">题名排序</option></select></div><div class="small" id="listCount"></div><div class="list" id="problemList"></div></aside>
 <main class="main" id="main">
-<div class="title-row"><div><div class="eyebrow">Problem</div><h2 id="title">选择一道题目开始练习</h2><div class="meta" id="meta"></div></div></div>
+<div class="title-row"><div><div class="eyebrow">Problem</div><h2 id="title">选择一道题目开始练习</h2><div class="meta" id="meta"></div></div><button class="btn" id="copyQuestionLink" type="button" title="将当前题目链接复制到剪贴板">复制题目链接</button></div>
 <div id="statement"><p class="lead">从左侧选择题目。本站优先整理完整题面和算法分类，测试数据会分批补齐；没有测试数据的题目仍可先编写并保存代码。</p></div>
 <div class="editor" id="editor" hidden>
 <div class="editor-head"><div><strong>在线编程与测评</strong><div class="small">先独立完成代码，再运行样例或提交全部测试。</div></div><div class="editor-tools"><select id="language"><option value="c">C11</option><option value="cpp">C++17</option><option value="python">Python 3</option></select><button class="btn" id="reset">重置代码</button><button class="btn" id="copySample">复制样例输入</button><button class="btn" id="runSample">运行首组测试</button><button class="btn primary" id="submit">提交测评</button></div></div>
@@ -198,7 +198,44 @@ function renderProblem(p){
  $('submit').disabled=!cs.length;
  renderList();
 }
-function selectProblem(id){if(running)return;saveCode();current=problems.find(p=>p.id===id);if(!current)return;saveLastProblem(id);renderProblem(current);}
+function problemFromHash(){
+ try {
+  const id=decodeURIComponent(location.hash.slice(1));
+  return problems.some(p=>p.id===id)?id:null;
+ }catch(e){return null;}
+}
+function selectProblem(id,updateHash=true){
+ if(running)return;
+ const found=problems.find(p=>p.id===id);
+ if(!found)return;
+ saveCode();
+ current=found;
+ saveLastProblem(id);
+ if(updateHash){
+  try{
+   const hash='#'+encodeURIComponent(id);
+   if(location.hash!==hash)history.replaceState(null,'',location.pathname+location.search+hash);
+  }catch(e){}
+ }
+ renderProblem(current);
+}
+$('copyQuestionLink').addEventListener('click',async()=>{
+ if(!current)return;
+ const link=location.origin+location.pathname+location.search+'#'+encodeURIComponent(current.id);
+ try{
+  if(!navigator.clipboard||!navigator.clipboard.writeText)throw Error('Clipboard unavailable');
+  await navigator.clipboard.writeText(link);
+  const button=$('copyQuestionLink');
+  button.textContent='链接已复制';
+  setTimeout(()=>{button.textContent='复制题目链接';},1700);
+ }catch(e){
+  window.prompt('复制以下题目链接：',link);
+ }
+});
+window.addEventListener('hashchange',()=>{
+ const id=problemFromHash();
+ if(id&&id!==current?.id)selectProblem(id,false);
+});
 $('language').addEventListener('change',()=>{const next=$('language').value;if(current){saveCode();$('code').value=getCode(current.id,next);}activeLanguage=next;});
 $('code').addEventListener('input',()=>{saveCode();if(current){clearPassed(current.id,activeLanguage);updateProgress();renderList();}});
 $('reset').addEventListener('click',()=>{if(!current)return;if($('code').value!==templates[activeLanguage]&&!confirm('重置会覆盖当前语言下保存的代码，确定继续吗？'))return;$('code').value=templates[activeLanguage];saveCode();clearPassed(current.id,activeLanguage);updateProgress();renderList();});
@@ -307,5 +344,5 @@ $('copySample').addEventListener('click',async()=>{if(!current)return;const samp
 document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.key!=='Enter'||e.target!==$('code'))return;e.preventDefault();if(running)return;execute(e.shiftKey?'sample':'all');});
 $('runSample').addEventListener('click',()=>execute('sample'));
 $('submit').addEventListener('click',()=>execute('all'));
-initFilters();renderList();selectProblem(restoreLastProblem()||problems.slice().sort((a,b)=>yearRank(b)-yearRank(a))[0].id);
+initFilters();renderList();selectProblem(problemFromHash()||restoreLastProblem()||problems.slice().sort((a,b)=>yearRank(b)-yearRank(a))[0].id);
 </script></body></html>
