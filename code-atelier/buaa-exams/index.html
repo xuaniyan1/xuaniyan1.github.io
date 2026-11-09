@@ -173,6 +173,7 @@ function validateBackup(data){
 function exportBackup(){
  try{
   const data=collectBackup(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  if(blob.size>8*1024*1024)throw new Error('备份文件超过 8 MB，暂不支持导出；请检查是否保存了超大代码文件。');
   const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='code-atelier-backup-'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(a);a.click();a.remove();
@@ -183,7 +184,7 @@ function exportBackup(){
 async function importBackupFile(file){
  if(running){$('backupStatus').textContent='当前正在测评，请测评结束后再导入。';return;}
  if(!file)return;
- if(file.size>2*1024*1024){$('backupStatus').textContent='备份文件超过 2 MB，已停止导入。';return;}
+ if(file.size>8*1024*1024){$('backupStatus').textContent='备份文件超过 8 MB，已停止导入。';return;}
  try{
   const raw=await file.text(),data=JSON.parse(raw),backup=validateBackup(data);
   let codeConflicts=0;
