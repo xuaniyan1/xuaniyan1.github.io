@@ -51,6 +51,22 @@ for (const problem of problems) {
   }
   categoryCounts.set(problem.category, (categoryCounts.get(problem.category) ?? 0) + 1);
 
+  // Training problems must never silently masquerade as historical BUAA exam questions.
+  if (problem.id.startsWith("train-408-") && problem.year !== "408 拓展") {
+    throw new Error(`Training problem ${problem.id} must use the separate 408 拓展 year label.`);
+  }
+  if (problem.year === "408 拓展") {
+    if (!String(problem.origin).includes("非北航历年真题")) {
+      throw new Error(`408 training problem ${problem.id} lacks explicit non-exam provenance.`);
+    }
+    if (typeof problem.sampleLabel !== "string" || !problem.sampleLabel.includes("训练")) {
+      throw new Error(`408 training problem ${problem.id} must label its sample as a training sample.`);
+    }
+    if (!String(problem.sampleNote || "").includes("不属于北航往年机试题")) {
+      throw new Error(`408 training problem ${problem.id} must explain that it is not a historical exam question.`);
+    }
+  }
+
   const tests = cases[problem.id];
   if (!Array.isArray(tests) || tests.length < 4) {
     throw new Error(`Problem ${problem.id} must have at least four runnable test cases.`);
@@ -106,3 +122,4 @@ if (!html.includes("c[2]||") || !html.includes("p.sampleLabel||")) {
 
 console.log(`Question bank validation passed: ${problems.length} problems, ${categoryCounts.size} categories, ${totalCases} test cases, ${inlineScripts.length} JavaScript block(s).`);
 console.log("All problems have at least four runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
+console.log(`Training bank: ${problems.filter(p => p.year === "408 拓展").length} explicitly marked non-exam questions; historical/reconstruction bank: ${problems.filter(p => p.year !== "408 拓展").length} questions.`);
