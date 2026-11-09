@@ -194,6 +194,7 @@ async function importBackupFile(file){
    '\n\n建议先导出当前进度作为备份。确定继续吗？';
   if(!confirm(message)){$('backupStatus').textContent='已取消导入，当前本地进度未更改。';return;}
   saveCode();
+  if(backup.lastProblem&&current?.id!==backup.lastProblem)selectProblem(backup.lastProblem);
   let importedCodes=0,importedPasses=0;
   try{
    for(const item of backup.codes){localStorage.setItem(codeKey(item.problemId,item.language),item.code);importedCodes++;}
@@ -205,7 +206,7 @@ async function importBackupFile(file){
    return;
   }
   updateProgress();renderList();
-  if(backup.lastProblem)selectProblem(backup.lastProblem);
+  if(backup.lastProblem&&current?.id===backup.lastProblem)renderProblem(current);
   else if(current)$('code').value=getCode(current.id,activeLanguage);
   $('backupStatus').textContent='导入完成：恢复 '+importedCodes+' 份代码、'+importedPasses+' 条通过记录。'+(backup.skipped?'跳过旧题记录 '+backup.skipped+' 条。':'');
  }catch(e){$('backupStatus').textContent='导入失败：'+e.message+'。当前本地进度未被清空。';}
