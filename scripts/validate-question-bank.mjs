@@ -249,7 +249,7 @@ for (const required of [
  'id="exportBackup"', 'id="importBackup"', 'id="backupFile"',
  "const backupFormat='code-atelier-buaa-exams'",
  "function collectBackup()", "function validateBackup(",
- "URL.createObjectURL(blob)", "file.size>2*1024*1024",
+ "URL.createObjectURL(blob)", "blob.size>8*1024*1024", "file.size>8*1024*1024",
  "if(!confirm(message))", "localStorage.setItem(codeKey(item.problemId,item.language),item.code)",
  "备份文件包含你的代码和通过记录"
 ]) {
