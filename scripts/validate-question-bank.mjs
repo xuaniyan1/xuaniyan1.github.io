@@ -243,6 +243,62 @@ for(const [index,test] of fractionCases.entries()) {
   }
 }
 
+// Local progress backup must be explicit, versioned, scoped to this question bank,
+// and must never clear unrelated localStorage keys.
+for (const required of [
+ 'id="exportBackup"', 'id="importBackup"', 'id="backupFile"',
+ "const backupFormat='code-atelier-buaa-exams'",
+ "function collectBackup()", "function validateBackup(",
+ "URL.createObjectURL(blob)", "file.size>2*1024*1024",
+ "if(!confirm(message))", "localStorage.setItem(codeKey(item.problemId,item.language),item.code)",
+ "备份文件包含你的代码和通过记录"
+]) {
+ if (!html.includes(required)) throw new Error("Progress backup feature is incomplete: " + required);
+}
+if (html.includes("localStorage.clear(")) {
+ throw new Error("Question bank must never clear the entire origin's localStorage.");
+}
+const backupStart=html.indexOf("const backupFormat=");
+const backupEnd=html.indexOf("function updateProgress(){",backupStart);
+if(backupStart<0||backupEnd<0)throw new Error("Cannot locate progress backup helpers.");
+const backupSource=html.slice(backupStart,backupEnd);
+const mockStore=new Map([
+ ["buaa-exam-code:"+problems[0].id+":cpp","int main(){return 0;}"],
+ ["buaa-exam-passed:"+problems[0].id+":cpp","1"],
+ ["unrelated-app-key","keep-me"],
+ ["buaa-exam-code:removed-problem:cpp","old code"]
+]);
+const mockStorage={
+ get length(){return mockStore.size;},
+ key(index){return [...mockStore.keys()][index]??null;},
+ getItem(key){return mockStore.has(key)?mockStore.get(key):null;},
+ setItem(key,value){mockStore.set(key,String(value));}
+};
+const backupApiFactory=new Function(
+ "problems","localStorage","restoreLastProblem","codeKey","passKey",
+ backupSource+"\nreturn {collectBackup,validateBackup};"
+);
+const backupApi=backupApiFactory(
+ problems,mockStorage,()=>problems[0].id,
+ (id,lang)=>"buaa-exam-code:"+id+":"+lang,
+ (id,lang)=>"buaa-exam-passed:"+id+":"+lang
+);
+const exported=backupApi.collectBackup();
+const normalized=backupApi.validateBackup(exported);
+if(normalized.codes.length!==1||normalized.passed.length!==1||normalized.lastProblem!==problems[0].id){
+ throw new Error("Backup export/import round-trip did not preserve code, pass state, and last problem.");
+}
+const withOldQuestion={...exported,codes:[...exported.codes,{problemId:"removed-problem",language:"c",code:"old"}]};
+if(backupApi.validateBackup(withOldQuestion).skipped!==1){
+ throw new Error("Backup import must safely skip records for removed/unknown problem IDs.");
+}
+let rejectedBadFormat=false;
+try{backupApi.validateBackup({...exported,format:"untrusted-format"});}catch{rejectedBadFormat=true;}
+if(!rejectedBadFormat)throw new Error("Backup import must reject unrecognized file formats.");
+if(!mockStore.has("unrelated-app-key")||mockStore.get("unrelated-app-key")!=="keep-me"){
+ throw new Error("Backup collection must not modify other applications' storage.");
+}
+
 console.log(`Question bank validation passed: ${problems.length} problems, ${categoryCounts.size} categories, ${totalCases} test cases, ${inlineScripts.length} JavaScript block(s).`);
 console.log("All problems have at least four runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
 console.log("Only sourced BUAA historical exam/camp questions and explicitly marked reconstructions are allowed; generic 408 training problems are excluded.");
