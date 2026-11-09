@@ -109,6 +109,61 @@ if (!html.includes("c[2]||") || !html.includes("p.sampleLabel||")) {
   throw new Error("Test coverage labels or sample provenance labels are not rendered.");
 }
 
+// Verify that the provenance tools and convenient year filters remain available.
+for (const required of ['id="sourceType"', 'id="sortOrder"', "function sourceGroup(", "function restoreLastProblem(", "value='recent'"]) {
+  if (!html.includes(required)) throw new Error("Question bank provenance UX is missing: " + required);
+}
+if (!html.includes("2022年北航计算机学院预推免机试第二题.pdf")) {
+  throw new Error("Source PDF reference for 2022 pre-admission exam is missing.");
+}
+
+// Independently validate the 2019 eyewitness-sourced circular queue reconstruction.
+// This deliberately uses a linked successor graph rather than the array-index deletion oracle.
+const circular = problems.find(problem => problem.id === "2019-summer-circular-min");
+if (!circular || circular.year !== "2019" || !circular.origin.includes("亲历回忆")) {
+  throw new Error("2019 summer camp eyewitness question or provenance is missing.");
+}
+if (!Array.isArray(cases[circular.id]) || cases[circular.id].length < 8) {
+  throw new Error("2019 circular queue reconstruction has insufficient coverage.");
+}
+function checkCircular(input) {
+  const values = input.trim().split(/\s+/).map(Number);
+  const n = values.shift();
+  if (!Number.isInteger(n) || n <= 0 || values.length !== n) {
+    throw new Error("Malformed 2019 circular queue test input.");
+  }
+  const next = Array.from({ length: n }, (_, i) => (i + 1) % n);
+  const lines = [];
+  let start = 0, remaining = n;
+  while (remaining > 0) {
+    let best = start, x = start;
+    for (let i = 0; i < remaining; i++) {
+      if (values[x] < values[best]) best = x;
+      x = next[x];
+    }
+    const visited = [];
+    x = start;
+    while (true) {
+      visited.push(values[x]);
+      if (x === best) break;
+      x = next[x];
+    }
+    lines.push(visited.join(" "));
+    if (remaining === 1) break;
+    let before = best;
+    while (next[before] !== best) before = next[before];
+    start = next[best];
+    next[before] = start;
+    remaining--;
+  }
+  return lines.join("\n");
+}
+for (const [index, test] of cases[circular.id].entries()) {
+  if (checkCircular(test[0]) !== test[1]) {
+    throw new Error("2019 circular queue test " + (index + 1) + " disagrees with linked-list reference.");
+  }
+}
+
 console.log(`Question bank validation passed: ${problems.length} problems, ${categoryCounts.size} categories, ${totalCases} test cases, ${inlineScripts.length} JavaScript block(s).`);
 console.log("All problems have at least four runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
 console.log("Only sourced BUAA historical exam/camp questions and explicitly marked reconstructions are allowed; generic 408 training problems are excluded.");
