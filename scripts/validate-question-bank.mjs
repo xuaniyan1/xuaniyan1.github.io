@@ -164,6 +164,71 @@ for (const [index, test] of cases[circular.id].entries()) {
   }
 }
 
+// Test the original-source question archive's share links, without changing saved code keys.
+for (const required of ['id="copyQuestionLink"', 'function problemFromHash()', "window.addEventListener('hashchange'", 'navigator.clipboard.writeText(link)']) {
+  if (!html.includes(required)) throw new Error("Question permalink support missing: " + required);
+}
+if (!html.includes("buaa-exam-code:") || !html.includes("buaa-exam-passed:")) {
+  throw new Error("Original saved code and solved-status storage keys must remain stable.");
+}
+
+// Verify every stored 2025-attributed fraction test against independent pairwise
+// and frequency-based solutions. Its *year* remains intentionally unverified.
+const fraction = problems.find(problem => problem.id === "2025-fraction");
+if (!fraction || fraction.year !== "年份待核验" || !String(fraction.origin).includes("2025")) {
+  throw new Error("The fraction question's disputed-year provenance was unexpectedly changed.");
+}
+const fractionCases = cases[fraction.id];
+if (!Array.isArray(fractionCases) || fractionCases.length < 10) {
+  throw new Error("The source-backed fraction problem must retain its boundary test suite.");
+}
+function gcdInt(a,b){while(b){const r=a%b;a=b;b=r;}return a;}
+function readGroups(input) {
+  const tokens=input.trim().split(/\s+/).map(Number),groups=[];
+  let pos=0;
+  while(pos<tokens.length){
+    const n=tokens[pos++];
+    if(!Number.isInteger(n)||n<1||n>600||pos+n>tokens.length){
+      throw new Error("Malformed fraction input group.");
+    }
+    const data=tokens.slice(pos,pos+n);
+    if(data.some(x=>!Number.isInteger(x)||x<=1||x>1000)){
+      throw new Error("Fraction input value out of source-defined range.");
+    }
+    groups.push(data);
+    pos+=n;
+  }
+  return groups;
+}
+function pairwiseFraction(group) {
+  let answer=0;
+  for(let i=0;i<group.length;i++){
+    for(let j=0;j<i;j++){
+      if(group[i]!==group[j]&&gcdInt(group[i],group[j])===1)answer++;
+    }
+  }
+  return answer;
+}
+function frequencyFraction(group) {
+  const freq=new Array(1001).fill(0);
+  for(const v of group)freq[v]++;
+  let answer=0;
+  for(let a=2;a<=1000;a++)if(freq[a]){
+    for(let b=a+1;b<=1000;b++){
+      if(freq[b]&&gcdInt(a,b)===1)answer+=freq[a]*freq[b];
+    }
+  }
+  return answer;
+}
+for(const [index,test] of fractionCases.entries()) {
+  const groups=readGroups(test[0]);
+  const simple=groups.map(pairwiseFraction).join("\n");
+  const optimized=groups.map(frequencyFraction).join("\n");
+  if(simple!==optimized||simple!==test[1]){
+    throw new Error("Fraction test " + (index+1) + " has inconsistent expected output.");
+  }
+}
+
 console.log(`Question bank validation passed: ${problems.length} problems, ${categoryCounts.size} categories, ${totalCases} test cases, ${inlineScripts.length} JavaScript block(s).`);
 console.log("All problems have at least four runnable tests; IDs, required fields, sample provenance, and test labels are consistent.");
 console.log("Only sourced BUAA historical exam/camp questions and explicitly marked reconstructions are allowed; generic 408 training problems are excluded.");
