@@ -63,7 +63,7 @@ details{border-top:1px solid var(--line);padding:10px 0}details summary{cursor:p
 <div class="title-row"><div><div class="eyebrow">Problem</div><h2 id="title">选择一道题目开始练习</h2><div class="meta" id="meta"></div></div><button class="btn" id="copyQuestionLink" type="button" title="将当前题目链接复制到剪贴板">复制题目链接</button></div>
 <div id="statement"><p class="lead">从左侧选择题目。本站优先整理完整题面和算法分类，测试数据会分批补齐；没有测试数据的题目仍可先编写并保存代码。</p></div>
 <div class="editor" id="editor" hidden>
-<div class="editor-head"><div><strong>在线编程与测评</strong><div class="small">先独立完成代码，再运行样例或提交全部测试。</div></div><div class="editor-tools"><select id="language"><option value="c">C11</option><option value="cpp">C++17</option><option value="python">Python 3</option></select><button class="btn" id="reset">重置代码</button><button class="btn" id="copySample">复制样例输入</button><button class="btn" id="runSample">运行首组测试</button><button class="btn primary" id="submit">提交测评</button></div></div>
+<div class="editor-head"><div><strong>在线编程与测评</strong><div class="small">先独立完成代码，再运行样例或提交全部测试。</div></div><div class="editor-tools"><select id="language"><option value="c">C11</option><option value="cpp">C++17</option><option value="python">Python 3</option></select><button class="btn" id="reset">重置代码</button><button class="btn" id="copySample">复制样例输入</button><button class="btn" id="runSample">运行首组测试</button><button class="btn" id="quickCheck">快速检查（前4组）</button><button class="btn primary" id="submit">完整测评</button></div></div>
 <textarea id="code" aria-label="代码编辑器" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
 <div class="small" style="margin-top:7px">代码按题目和语言自动保存在当前浏览器；通过记录也保存在本地，不会云同步。快捷键：Ctrl/⌘ + Enter 提交全部测试，Ctrl/⌘ + Shift + Enter 运行首组测试。运行时，代码和测试输入会发送到第三方 Wandbox 编译运行服务；请勿提交密码、隐私或密钥。服务可能限流或暂时不可用。</div>
 <div class="result" id="result" aria-live="polite" role="status">等待运行。选择 C / C++ / Python 后，点击“运行首组测试”或“提交全部测试”。</div>
@@ -196,6 +196,8 @@ function renderProblem(p){
  $('copySample').disabled=!hasSample;
  $('runSample').disabled=!hasSample;
  $('submit').disabled=!cs.length;
+ $('quickCheck').hidden=cs.length<=4;
+ $('quickCheck').disabled=cs.length<=4;
  renderList();
 }
 function problemFromHash(){
@@ -294,10 +296,10 @@ function mismatchDetail(actual,expected){
 async function execute(mode){
  if(!current||running)return;
  const problemId=current.id,code=$('code').value,lang=activeLanguage,cs=cases[problemId]||[];
- const chosen=mode==='sample'?(cs.length?cs.slice(0,1):(current.sampleInput!==undefined&&current.sampleOutput!==undefined?[[current.sampleInput,current.sampleOutput]]:[])):cs;
+ const chosen=mode==='sample'?(cs.length?cs.slice(0,1):(current.sampleInput!==undefined&&current.sampleOutput!==undefined?[[current.sampleInput,current.sampleOutput]]:[])):mode==='quick'?cs.slice(0,4):cs;
  if(!code.trim()){$('result').textContent='请先编写代码。';return;}
  if(!chosen.length){$('result').textContent=mode==='sample'?'本题尚未提供可运行样例。':'本题完整测试数据待补充，暂不开放提交测评。';return;}
- running=true;$('submit').disabled=true;$('runSample').disabled=true;$('code').disabled=true;$('language').disabled=true;$('reset').disabled=true;renderList();
+ running=true;$('submit').disabled=true;$('runSample').disabled=true;$('quickCheck').disabled=true;$('code').disabled=true;$('language').disabled=true;$('reset').disabled=true;renderList();
  let lines=[],passed=0,completed=0,attempted=0,stopped=false,compilerName='';
  const show=()=>{$('result').textContent=lines.join('\n');};
  $('result').textContent='正在连接编译服务…';
@@ -324,6 +326,8 @@ async function execute(mode){
    lines.push('评测中止：已尝试 '+attempted+' / '+chosen.length+' 组，已完成结果比较 '+completed+' 组；剩余测试未执行，不计算总通过率。');
   }else if(mode==='sample'){
    lines.push('首组测试结果：'+passed+' / '+completed+' 组通过。首组通过不代表整题通过。');
+  }else if(mode==='quick'){
+   lines.push('快速检查：'+passed+' / '+completed+' 组通过。仅检查前 '+completed+' 组，不记录整题 AC；请在准备好后使用完整测评。');
   }else{
    lines.push('测评结果：'+passed+' / '+completed+' 组通过。');
    if(completed===chosen.length&&passed===chosen.length){
@@ -337,12 +341,13 @@ async function execute(mode){
  }catch(e){
   lines.push('测评服务暂不可用：'+e.message);show();
  }finally{
-  running=false;$('submit').disabled=!(cases[current?.id]||[]).length;$('runSample').disabled=!(cases[current?.id]||[]).length&&!(current?.sampleInput!==undefined&&current?.sampleOutput!==undefined);$('copySample').disabled=!(cases[current?.id]||[]).length&&current?.sampleInput===undefined;$('code').disabled=false;$('language').disabled=false;$('reset').disabled=false;renderList();
+  running=false;$('submit').disabled=!(cases[current?.id]||[]).length;$('quickCheck').disabled=(cases[current?.id]||[]).length<=4;$('runSample').disabled=!(cases[current?.id]||[]).length&&!(current?.sampleInput!==undefined&&current?.sampleOutput!==undefined);$('copySample').disabled=!(cases[current?.id]||[]).length&&current?.sampleInput===undefined;$('code').disabled=false;$('language').disabled=false;$('reset').disabled=false;renderList();
  }
 }
 $('copySample').addEventListener('click',async()=>{if(!current)return;const sample=(cases[current.id]||[])[0];const input=current.sampleInput!==undefined?current.sampleInput:sample?.[0];if(input===undefined){$('result').textContent='本题暂无样例输入。';return;}try{if(!navigator.clipboard?.writeText)throw new Error('当前浏览器不支持剪贴板 API');await navigator.clipboard.writeText(input);$('result').textContent='样例输入已复制。';}catch(e){$('result').textContent='复制失败，请从题目样例区域手动复制输入。';}});
 document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.key!=='Enter'||e.target!==$('code'))return;e.preventDefault();if(running)return;execute(e.shiftKey?'sample':'all');});
 $('runSample').addEventListener('click',()=>execute('sample'));
+$('quickCheck').addEventListener('click',()=>execute('quick'));
 $('submit').addEventListener('click',()=>execute('all'));
 initFilters();renderList();selectProblem(problemFromHash()||restoreLastProblem()||problems.slice().sort((a,b)=>yearRank(b)-yearRank(a))[0].id);
 </script></body></html>
