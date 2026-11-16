@@ -22,11 +22,24 @@ h1{font-size:30px;letter-spacing:-1.4px;line-height:1.3;margin:8px 0}.hero p{fon
 .config{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.config label{font-size:10px;color:#819087;font-weight:750;display:block;margin-bottom:5px}.smallnote{background:var(--blue-soft);color:#536c73;padding:12px 14px;border-radius:10px;font-size:11px;line-height:1.8;margin-top:12px}
 .test-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums}.timer.warn{color:var(--red)}.progressbar{height:6px;background:#e6ece6;border-radius:6px;overflow:hidden;margin:11px 0}.progressbar div{height:100%;background:#3d8c64;transition:width .2s}.exam-choice{display:flex;gap:10px;margin:16px 0}.exam-choice button{min-width:110px}.exam-choice .selected{outline:2px solid #6b9f7e}.exam-choice .selected.false{background:var(--red-soft);color:var(--red);border-color:#e1aea8;outline-color:#d0a19a}.final-list{display:grid;gap:10px;margin:12px 0}.final-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.final-item h3{font-size:12px;line-height:1.8;margin:8px 0}.final-item p{font-size:11px;line-height:1.8;color:#647568;margin:9px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.statline{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:11px}.track{height:7px;border-radius:10px;background:#edf1eb;flex:1;overflow:hidden}.track i{height:100%;background:#7cac8d;display:block;border-radius:10px}.track em{display:block;height:100%;background:#b3c8b7}.proof-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;margin:10px 0}.proof-card h3{font-size:14px;margin:0 0 9px;line-height:1.75}.proof-card .hidden-answer{margin-top:9px;background:#f7faf6;border:1px solid var(--line);border-radius:9px;padding:12px;line-height:1.9;font-size:12px}.proof-card textarea{margin-top:8px}.audit-card{background:#fff;border:1px solid #eadfcf;border-left:3px solid #d5ad65;border-radius:11px;padding:15px;margin-bottom:10px}.audit-card h3{font-size:12px;line-height:1.7;margin:0 0 7px}.audit-card p{font-size:11px;color:#728074;line-height:1.85;margin:5px 0}.footer{display:flex;justify-content:space-between;font-size:10px;color:#9ca69d;padding:25px 0 38px}
 @media(max-width:950px){.workspace{grid-template-columns:1fr}.list{max-height:240px}.grid{grid-template-columns:1fr}}@media(max-width:620px){.shell{padding:0 12px}.nav{gap:9px;font-size:10px}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:25px}.tab{font-size:10px;padding:9px 8px}.config{grid-template-columns:1fr}.footer{flex-direction:column;gap:6px}.prompt{font-size:15px}}
+
+.cloud-panel{margin:12px 0 17px;border:1px solid #dce7df;border-radius:12px;padding:10px 14px;background:#f6fbf7}
+.cloud-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#53705b;font-size:11px;line-height:1.7}
+.cloud-row b{color:#28573d;font-size:12px}
+.cloud-row a{color:#2c6948;font-weight:700}
+.cloud-row button{border:1px solid #bdd5c5;border-radius:8px;background:#fff;padding:7px 10px;font-size:11px;color:#285b41;font-weight:700;cursor:pointer}
+.cloud-row button:hover{background:#e5f2e9}
+.cloud-auth-form{display:flex;flex-wrap:wrap;gap:6px}
+.cloud-auth-form input{min-width:180px;border-radius:8px;padding:7px 10px;border:1px solid #c8d9ce;font-size:11px}
+.cloud-message{color:#7b8d80}
+@media(max-width:600px){.cloud-row{align-items:stretch}.cloud-auth-form{width:100%}.cloud-auth-form input{flex:1}}
+
 </style>
 </head>
 <body><div class="shell">
 <header class="top"><a class="brand" href="../"><span class="logo">CA</span><span>Code Atelier<small>EXAM PRACTICE · DISCRETE MATH II</small></span></a><nav class="nav"><a href="./">作业题库</a><a href="./learning.html">学习地图</a><a href="../">总首页</a></nav></header>
 <section class="hero"><div class="eyebrow">EVIDENCE-BASED EXAM PRACTICE</div><h1>历年真题 · 主动练习场</h1><p>从原始试卷中整理 40 道判断原题（其中 39 道可自动判分）和证明题。支持逐题训练、计时模拟、错题复习与证明草稿。题干经过符号标准化，参考答案依据资料核对；存在争议的题不参与自动判分。</p></section>
+<div id="cloudAccount" class="cloud-panel" aria-live="polite"></div>
 <div class="stats"><div class="stat"><strong id="countTF">—</strong><small>可判分判断题（另有争议原题）</small></div><div class="stat"><strong id="countProof">—</strong><small>原卷证明与计算题</small></div><div class="stat"><strong id="countDone">0</strong><small>已作答不同题目</small></div><div class="stat"><strong id="countDue">0</strong><small>当前到期复习</small></div></div>
 <div class="tablist" role="tablist" aria-label="历年真题训练导航"><button class="tab active" data-tab="practice">逐题训练</button><button class="tab" data-tab="test">计时模拟</button><button class="tab" data-tab="proof">证明与计算</button><button class="tab" data-tab="review">复习与考频</button><button class="tab" data-tab="audit">来源校对</button></div>
 <section class="pane active" id="pane-practice"><div class="workspace">
@@ -50,6 +63,8 @@ h1{font-size:30px;letter-spacing:-1.4px;line-height:1.3;margin:8px 0}.hero p{fon
 <footer class="footer"><span>CODE ATELIER · DISCRETE MATHEMATICS II</span><span>原卷可追溯 · 不确定题不计分 · 错题定期复习</span></footer>
 </div>
 <script src="./exam-data.js"></script>
+<script src="./cloud-config.js"></script>
+<script src="./cloud-sync.js"></script>
 <script>
 (function(){
 "use strict";
@@ -67,7 +82,13 @@ try{const v=JSON.parse(localStorage.getItem(KEY)||"null");if(v&&typeof v==="obje
 saved.records=saved.records||{};saved.bookmarks=Array.isArray(saved.bookmarks)?saved.bookmarks:[];saved.drafts=saved.drafts||{};
 let selected=GRADABLE[0]?.id||null;
 let session=null,timerId=null;
-function persist(){try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(e){console.warn("无法写入本地记录",e);}}
+function persist(){
+   try {
+     const key=window.DM2Cloud?window.DM2Cloud.storageKey(KEY):KEY;
+     localStorage.setItem(key,JSON.stringify(saved));
+     window.DM2Cloud?.changed("exam");
+   }catch(e){console.warn("无法写入本地记录",e);}
+ }
 function record(id,isCorrect){
  const old=saved.records[id]||{level:0,attempts:0,correct:0,wrong:0};
  const level=isCorrect?Math.min(5,(old.level||0)+1):0;
@@ -266,5 +287,34 @@ if(typeof location!=="undefined"){
  if(requestedTopic&&topics.includes(requestedTopic))$("topic").value=requestedTopic;
 }
 renderStats();renderPractice();renderProof();
+
+if(window.DM2Cloud) window.DM2Cloud.register({
+ section:"exam",legacyKey:KEY,
+ empty:()=>({records:{},bookmarks:[],drafts:{},lastResult:null}),
+ snapshot:()=>JSON.parse(JSON.stringify(saved)),
+ apply:(next)=>{
+  const v=next&&typeof next==="object"?next:{};
+  saved={
+   records:v.records&&typeof v.records==="object"?v.records:{},
+   bookmarks:Array.isArray(v.bookmarks)?v.bookmarks:[],
+   drafts:v.drafts&&typeof v.drafts==="object"?v.drafts:{},
+   lastResult:v.lastResult||null
+  };
+  renderStats();renderPractice();renderProof();renderReview();
+ },
+ merge:(current,guest)=>{
+  const records={...(current.records||{})};
+  for(const [id,r] of Object.entries(guest.records||{})){
+   if(!records[id]||(r.last||0)>(records[id].last||0)) records[id]=r;
+  }
+  const a=current.lastResult,b=guest.lastResult;
+  return {
+   records,
+   bookmarks:[...new Set([...(current.bookmarks||[]),...(guest.bookmarks||[])])],
+   drafts:{...(current.drafts||{}),...(guest.drafts||{})},
+   lastResult:!a?b:!b?a:(new Date(b.at)>new Date(a.at)?b:a)
+  };
+ }
+});
 })();
 </script></body></html>
