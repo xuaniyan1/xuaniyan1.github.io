@@ -41,6 +41,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 .recent-route{display:flex;gap:7px;flex-wrap:wrap;margin:-3px 0 17px}
 .recent-route a{border:1px solid #dfe9e0;background:#fff;color:#37684c;padding:8px 10px;border-radius:8px;font-size:10px;font-weight:800;text-decoration:none}
 .recent-route a:hover{background:#eef5ef;border-color:#a6c9ac}
+.solution-source-note{margin:10px 0 14px;padding:9px 11px;background:#f5f7f3;border-left:3px solid #879d88;border-radius:7px;color:#69786c;font-size:10px;line-height:1.8}
 </style>
 </head>
 <body>
@@ -84,7 +85,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
    <button class="unit-btn" data-status="bookmarked">我的收藏 <em>收藏</em></button>
   </div>
   <div class="side-divider"></div>
-  <div class="side-note">题库共 57 题，其中重点专题为 2025 秋季作业 40 题（第 1—6、8 次），逐题对照原始参考答案扩充思路、推导、结论与易错点。第 7 次作业原 PDF 标注为 2024 秋，单独保留；另有 9 道 2025—2026 期末回忆题。</div>
+  <div class="side-note">题库共 66 题：2025 秋作业 40 题为主线，2024 秋作业 8 题、2025—2026 期末回忆题 9 题和 2022 图论复习题 9 题均单独标注来源。原题、课程依据和本站补充讲解会分别说明。</div>
  </aside>
  <section class="panel list-panel">
   <div class="filters">
@@ -110,6 +111,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <script src="./questions-data.js"></script>
 <script src="./solutions-data.js"></script>
 <script src="./ppt-guides.js"></script>
+<script src="./graph2022-data.js"></script>
 <script src="./exam-data.js"></script>
 <script>
 (()=>{
@@ -134,7 +136,7 @@ let toastTimer;
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),1800);}
 function isReview(q){return /待校对|待人工|需对照|OCR 不完整|OCR缺失|需核对|暂未/.test(q.review_status||"");}
 function statusOf(q){return progress.status[q.id]||"todo";}
-function assignmentLabel(q){const m=q.id.match(/^DM2-HW(\d+)-/);return m?"第"+Number(m[1])+"次作业"+(q.year==="2024秋"?" · 2024秋":""):q.id.includes("FINAL")?"期末回忆版":"";}
+function assignmentLabel(q){if(q.id.startsWith("DM2-GR2022-"))return "2022 图论复习";const m=q.id.match(/^DM2-HW(\d+)-/);return m?"第"+Number(m[1])+"次作业"+(q.year==="2024秋"?" · 2024秋":""):q.id.includes("FINAL")?"期末回忆版":"";}
 function renderStats(){
  $("totalStat").textContent=questions.length;
  $("masteredStat").textContent=Object.values(progress.status).filter(x=>x==="mastered").length;
@@ -152,7 +154,7 @@ function refreshSelects(){
   ["2025秋季作业（40题）","2025"],
   ["第一次作业（7题）","HW01"],["第二次作业（4题）","HW02"],["第三次作业（6题）","HW03"],["第四次作业（7题）","HW04"],
   ["第五次作业（8题）","HW05"],["第六次作业（4题）","HW06"],["第七次作业 · 2024秋（8题）","HW07"],["第八次作业（4题）","HW08"],
-  ["2025—2026期末回忆版（9题）","FINAL"]
+  ["2025—2026期末回忆版（9题）","FINAL"],["2022 图论复习题（9题）","GRAPH2022"]
  ];
  const el=$("assignmentSelect"),old=el.value;
  el.innerHTML='<option value="">全部作业 / 试卷</option>'+assignmentOptions.map(([label,value])=>'<option value="'+value+'">'+label+'</option>').join("");
@@ -167,6 +169,7 @@ function matches(q){
  const assignment=$("assignmentSelect").value;
  if(assignment==="2025"&&(!/^DM2-HW/.test(q.id)||q.year!=="2025秋"))return false;
  if(assignment==="FINAL"&&!q.id.includes("FINAL"))return false;
+ if(assignment==="GRAPH2022"&&!q.id.startsWith("DM2-GR2022-"))return false;
  if(assignment&&assignment!=="2025"&&assignment!=="FINAL"&&!q.id.startsWith("DM2-"+assignment+"-"))return false;
  if(activeUnit&&q.normalizedUnit!==activeUnit)return false;
  if($("typeSelect").value&&q.type!==$("typeSelect").value)return false;
@@ -203,8 +206,8 @@ function renderPptGuide(q){
   const lowConfidence=/回忆版|OCR|需对照|缺失|指定子集/.test(item.prompt)||item.id==="DM2-FINAL-2025-Q07";
   return '<a href="./?q='+encodeURIComponent(id)+'">'+esc(item.title||id)+'</a>'+(lowConfidence?' <small>（回忆版，题干需核验）</small>':'');
  }).filter(Boolean);
- const refs='<b>'+(guide.isRecent?'近期原题：':'原课件：')+'</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>总复习：</b>'+esc(guide.review.name)+' 第 '+guide.review.page+' 页';
- return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">'+(guide.isRecent?'2025—2026 期末回忆版':'2025 秋作业')+'</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
+ const refs='<b>'+(guide.isRecent?'近期原题：':guide.isGraphReview?'复习题原文：':'课程依据：')+'</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>题目来源：</b>'+esc(guide.review.name||"总复习.pdf")+' 第 '+guide.review.page+' 页';
+ return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">'+(guide.isRecent?'2025—2026 期末回忆版':guide.isGraphReview?'2022 图论复习题':'2025 秋作业')+'</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
   '<div class="ppt-reference">'+refs+'</div>'+
   '<div class="ppt-definition"><b>课件中的核心定义 / 定理：</b><br>'+richText(guide.definition)+'</div>'+
   '<details><summary>提示 1 · 我应该从哪里开始想？</summary><p>'+richText(guide.firstStep)+'</p></details>'+
@@ -225,7 +228,8 @@ function renderSolution(q){
  const diagram=solutionData.diagram?'<div class="solution-diagram">'+solutionData.diagram+'</div>':"";
  const answer=solutionData.answer?'<div class="solution-answer"><b>本题结论</b><p>'+richText(solutionData.answer)+'</p></div>':"";
  const pitfalls=solutionData.pitfalls?'<div class="solution-pitfalls"><b>易错提醒</b><p>'+richText(solutionData.pitfalls)+'</p></div>':"";
- return '<section class="solution"><div class="solution-header"><div><div class="solution-kicker">STEP-BY-STEP EXPLANATION</div><h3>解题解析</h3></div><span>考点 · 思路 · 推导</span></div><div class="solution-concept"><b>考点与切入点</b><p>'+richText(solutionData.concept)+'</p></div>'+diagram+'<div class="solution-steps">'+steps+'</div>'+answer+pitfalls+'</section>';
+ const sourceNote=solutionData.sourceNote?'<div class="solution-source-note">'+richText(solutionData.sourceNote)+'</div>':"";
+ return '<section class="solution"><div class="solution-header"><div><div class="solution-kicker">STEP-BY-STEP EXPLANATION</div><h3>解题解析</h3></div><span>考点 · 思路 · 推导</span></div>'+sourceNote+'<div class="solution-concept"><b>考点与切入点</b><p>'+richText(solutionData.concept)+'</p></div>'+diagram+'<div class="solution-steps">'+steps+'</div>'+answer+pitfalls+'</section>';
 }
 function relatedExamHtml(q){
  const all=(window.DM2_EXAM_DATA||{}).judgement||[];
@@ -273,10 +277,10 @@ async function init(){
   if(!("DecompressionStream" in window))throw new Error("当前浏览器不支持题库数据解压，请使用新版 Edge、Chrome 或 Firefox。");
   const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
   const data=JSON.parse(await new Response(stream).text());
-  questions=(data.questions||[]).map(q=>{const patch=(window.DM2_QUESTION_PATCHES||{})[q.id]||{};const merged={...q,...patch};return {...merged,normalizedUnit:normalizeUnit(merged.unit||q.unit)};});
+  questions=[...(data.questions||[]).map(q=>{const patch=(window.DM2_QUESTION_PATCHES||{})[q.id]||{};const merged={...q,...patch};return {...merged,normalizedUnit:normalizeUnit(merged.unit||q.unit)};}),...(window.DM2_EXTRA_QUESTIONS||[]).map(q=>({...q,normalizedUnit:normalizeUnit(q.unit||q.chapter)}))];
   renderStats();renderUnits();refreshSelects();
   const requestedId=new URLSearchParams(location.search).get("q");
-  if(requestedId&&questions.some(q=>q.id===requestedId)){selectedId=requestedId;const m=requestedId.match(/^DM2-(HW\d+|FINAL)-/);if(m)$("assignmentSelect").value=m[1];}
+  if(requestedId&&questions.some(q=>q.id===requestedId)){selectedId=requestedId;if(requestedId.startsWith("DM2-GR2022-"))$("assignmentSelect").value="GRAPH2022";else {const m=requestedId.match(/^DM2-(HW\\d+|FINAL)-/);if(m)$("assignmentSelect").value=m[1];}}
   renderList();
   $("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");
   $("solutionModeBtn").addEventListener("click",()=>{showSolutions=!showSolutions;$("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");renderDetail();});
