@@ -35,7 +35,7 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
 <section class="stats">
  <div class="stat"><strong>40</strong><span>2025 秋作业核心题</span></div>
  <div class="stat"><strong>11</strong><span>历年试卷/回忆版记录</span></div>
- <div class="stat"><strong>17</strong><span>证明方法卡</span></div>
+ <div class="stat"><strong>18</strong><span>证明方法卡</span></div>
  <div class="stat"><strong>2</strong><span>交互实验室</span></div>
 </section>
 <nav class="tabs" aria-label="学习地图导航">
@@ -248,8 +248,10 @@ function analyzePoset(){
   const lower=posetLabels.filter(l=>subset.every(s=>rel.has(pairKey(l,s))));
   const sup=upper.filter(u=>upper.every(v=>rel.has(pairKey(u,v))));
   const inf=lower.filter(l=>lower.every(v=>rel.has(pairKey(v,l))));
+  const remaining=new Set(posetLabels),linearExtension=[];
+  while(remaining.size){const candidates=[...remaining].filter(a=>![...remaining].some(b=>less(b,a)));if(!candidates.length)throw new Error("剩余顶点中找不到极小元，关系存在环。");const chosen=candidates[0];linearExtension.push(chosen);remaining.delete(chosen);}
   const fmt=x=>x.length?x.join("、"):"不存在";
-  $("posetResult").innerHTML='<b class="good">输入关系通过偏序检查（自反、反对称、传递）。</b><br><b>传递闭包中的有序对：</b>'+esc(pairList(rel))+'<br><b>覆盖关系：</b>'+esc(actualCovers.join("；")||"无")+'<br><b>极小元：</b>'+esc(fmt(minimal))+'；<b>极大元：</b>'+esc(fmt(maximal))+'<br><b>最小元：</b>'+esc(fmt(least))+'；<b>最大元：</b>'+esc(fmt(greatest))+'<hr><b>当前子集：</b>'+esc("{"+subset.join(", ")+"}")+'<br><b>上界：</b>'+esc(fmt(upper))+'；<b>下界：</b>'+esc(fmt(lower))+'<br><b>上确界：</b>'+esc(fmt(sup))+'；<b>下确界：</b>'+esc(fmt(inf));
+  $("posetResult").innerHTML='<b class="good">输入关系通过偏序检查（自反、反对称、传递）。</b><br><b>传递闭包中的有序对：</b>'+esc(pairList(rel))+'<br><b>覆盖关系：</b>'+esc(actualCovers.join("；")||"无")+'<br><b>极小元：</b>'+esc(fmt(minimal))+'；<b>极大元：</b>'+esc(fmt(maximal))+'<br><b>最小元：</b>'+esc(fmt(least))+'；<b>最大元：</b>'+esc(fmt(greatest))+'<hr><b>当前子集：</b>'+esc("{"+subset.join(", ")+"}")+'<br><b>上界：</b>'+esc(fmt(upper))+'；<b>下界：</b>'+esc(fmt(lower))+'<br><b>上确界：</b>'+esc(fmt(sup))+'；<b>下确界：</b>'+esc(fmt(inf))+'<br><b>一种相容全序（线性扩张/拓扑排序）：</b>'+esc(linearExtension.join(" < "))+'<br><span class="hint">若一步有多个极小元，任选其一会得到不同的合法线性扩张；原偏序中不可比的元素并没有因此变成可比。</span>';
  }catch(e){$("posetResult").innerHTML='<span class="bad">无法构成偏序：</span>'+esc(e.message);}
 }
 $("checkPoset").addEventListener("click",analyzePoset);
