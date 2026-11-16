@@ -174,6 +174,7 @@
     e.warning = "";
     if (e.timer) { clearTimeout(e.timer); e.timer = null; }
     if (!user) {
+      e.sending = false;
       e.revision = null;
       e.apply(jsonGet(e.legacyKey, e.empty()));
       e.loaded = true;
@@ -248,8 +249,8 @@
         client = window.supabase.createClient(cfg.url, cfg.publishableKey);
         render();
         var auth = await client.auth.getUser();
-        if (auth.error) throw auth.error;
-        await setUser(auth.data.user);
+        if (auth.error && auth.error.name !== "AuthSessionMissingError") throw auth.error;
+        await setUser(auth.data && auth.data.user ? auth.data.user : null);
         client.auth.onAuthStateChange(function (event) {
           if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_DELETED") {
             setTimeout(async function () {
@@ -316,7 +317,7 @@
         if (updated.error) throw updated.error;
         row = updated.data;
       }
-      if (user.id !== identity) return;
+      if (!user || user.id !== identity) return;
       if (!row) throw new Error("VERSION_CONFLICT");
       e.revision = row.revision;
       if (JSON.stringify(e.snapshot()) === serialized) {
