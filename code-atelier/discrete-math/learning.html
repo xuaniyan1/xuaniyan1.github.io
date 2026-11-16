@@ -44,6 +44,7 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
  <button class="tab" data-tab="exams">历年考频</button>
  <button class="tab" data-tab="resources">资料资产</button>
  <button class="tab" data-tab="variants">变式训练</button>
+ <button class="tab" data-tab="supplemental">历史补充</button>
  <button class="tab" data-tab="labs">交互实验室</button>
 </nav>
 
@@ -75,6 +76,12 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
 <section class="pane" id="pane-variants">
  <div class="section-head"><div><h2>变式训练</h2><p>以下题目是根据课程原题设计的 AI 拓展练习，不是老师原题，也不计入 40 道作业题。</p></div></div>
  <div class="variant-grid" id="variantGrid"></div>
+</section>
+
+<section class="pane" id="pane-supplemental">
+ <div class="section-head"><div><h2>历史作业与补充习题</h2><p>从旧版作业参考答案、补充习题集和 2022 图论复习课件中抽取的专题。它们不是 2025 秋作业原题，适合主线完成后的迁移训练。</p></div></div>
+ <input class="searchbar" id="suppSearch" placeholder="搜索：反对称关系计数、闭包、Ore 定理、树、Huffman……">
+ <div class="variant-grid" id="supplementalGrid"></div>
 </section>
 
 <section class="pane" id="pane-labs">
@@ -146,9 +153,15 @@ function renderResources(){
 function renderVariants(){
  $("variantGrid").innerHTML=D.variants.map(v=>'<article class="variant"><span class="pill amber">AI 拓展 · 非原题</span><h3>'+esc(v.id)+' · '+esc(v.topic)+'</h3><div class="source">基于 '+esc(v.from)+'</div><div class="prompt">'+esc(v.prompt)+'</div><details><summary>查看参考答案与提示</summary><p><b>提示：</b>'+esc(v.hint)+'</p><p><b>答案：</b>'+esc(v.answer)+'</p></details></article>').join("");
 }
+function renderSupplemental(filter=""){
+ const f=filter.trim().toLowerCase();
+ const rows=(D.supplemental||[]).filter(x=>[x.id,x.title,x.source,x.prompt,x.answer,x.warning].join(" ").toLowerCase().includes(f));
+ $("supplementalGrid").innerHTML=rows.map(x=>'<article class="variant"><span class="pill green">资料原题 / 原答案改写</span><span class="pill amber">'+esc(x.level)+'</span><h3>'+esc(x.id)+' · '+esc(x.title)+'</h3><div class="source">'+esc(x.source)+'</div><div class="prompt">'+esc(x.prompt)+'</div><details><summary>查看解题思路与校对提醒</summary><p><b>参考解题：</b>'+esc(x.answer)+'</p><p class="caution">'+esc(x.warning)+'</p></details></article>').join("")||'<div class="card">没有找到匹配的补充题。</div>';
+}
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("active",p.id==="pane-"+b.dataset.tab));}));
 $("methodSearch").addEventListener("input",e=>renderMethods(e.target.value));
-renderModules();renderPaths();renderMethods();renderExams();renderResources();renderVariants();
+$("suppSearch").addEventListener("input",e=>renderSupplemental(e.target.value));
+renderModules();renderPaths();renderMethods();renderExams();renderResources();renderVariants();renderSupplemental();
 
 /* Relation checker: exact definitions on A={1,2,3}. */
 const presets={
