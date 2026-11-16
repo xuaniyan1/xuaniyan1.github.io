@@ -29,7 +29,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <div class="shell">
 <header>
  <a class="brand" href="../"><span class="mark">CA</span><span>Code Atelier<small>PERSONAL PRACTICE SPACE</small></span></a>
- <nav class="nav"><a href="../">总首页</a><a href="./learning.html">学习地图</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
+ <nav class="nav"><a href="../">总首页</a><a href="./learning.html">学习地图</a><a href="./exam.html">历年真题</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
 </header>
 <section class="hero">
  <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，逐题查看参考解答思路、完整推导与易错点。进度和草稿保存在当前浏览器。</p></div>
@@ -80,6 +80,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <div class="toast" id="toast"></div>
 <script src="./questions-data.js"></script>
 <script src="./solutions-data.js"></script>
+<script src="./exam-data.js"></script>
 <script>
 (()=>{
 "use strict";
@@ -176,6 +177,12 @@ function renderSolution(q){
  const pitfalls=solutionData.pitfalls?'<div class="solution-pitfalls"><b>易错提醒</b><p>'+richText(solutionData.pitfalls)+'</p></div>':"";
  return '<section class="solution"><div class="solution-header"><div><div class="solution-kicker">STEP-BY-STEP EXPLANATION</div><h3>解题解析</h3></div><span>考点 · 思路 · 推导</span></div><div class="solution-concept"><b>考点与切入点</b><p>'+richText(solutionData.concept)+'</p></div>'+diagram+'<div class="solution-steps">'+steps+'</div>'+answer+pitfalls+'</section>';
 }
+function relatedExamHtml(q){
+ const all=(window.DM2_EXAM_DATA||{}).judgement||[];
+ const matches=all.filter(item=>item.related===q.id&&item.gradable!==false).slice(0,6);
+ if(!matches.length)return '<div class="source"><a href="./exam.html">历年原题训练：按年份和知识点练习 ↗</a></div>';
+ return '<div class="source"><b>历年真题 · 同考点迁移</b><br>'+matches.map(e=>'<a href="./exam.html?q='+encodeURIComponent(e.id)+'">'+esc(e.year+' 第'+e.number+'判断')+'</a>').join('　')+'<br><small>历年题独立保存来源，与 2025 秋作业分开统计。</small></div>';
+}
 function renderDetail(){
  const q=questions.find(x=>x.id===selectedId);
  if(!q){$("detailPanel").innerHTML='<div class="empty">选择左侧题目开始练习。</div>';return;}
@@ -190,6 +197,7 @@ function renderDetail(){
  '<div class="prompt-label">QUESTION / 题目</div><div class="prompt">'+richText(q.prompt)+'</div>'+
  figureNote+
  solutionHtml+
+ relatedExamHtml(q)+
  '<div class="solve-head"><b>我的解题笔记</b><span>自动保存在当前浏览器</span></div>'+
  '<textarea class="draft" id="draftInput" placeholder="记录你自己的思路、卡住的步骤、证明草稿或复习提醒…">'+esc(progress.drafts[q.id]||"")+'</textarea>'+
  '<div class="actions"><button class="btn" id="solutionToggleBtn">'+(showSolutions?"隐藏参考解析":"显示参考解析")+'</button><button class="btn primary '+(s==="mastered"?"selected":"")+'" id="masterBtn">'+(s==="mastered"?"✓ 已掌握":"标记已掌握")+'</button><button class="btn '+(s==="wrong"?"wrong-selected":"")+'" id="wrongBtn">'+(s==="wrong"?"↺ 已加入错题":"加入错题本")+'</button><button class="btn '+(book?"selected":"")+'" id="bookmarkBtn">'+(book?"★ 已收藏":"☆ 收藏")+'</button><button class="btn" id="clearBtn">清除状态</button></div>'+
