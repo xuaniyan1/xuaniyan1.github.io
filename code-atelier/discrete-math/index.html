@@ -262,11 +262,12 @@ function renderDetail(){
  const q=questions.find(x=>x.id===selectedId);
  if(!q){$("detailPanel").innerHTML='<div class="empty">选择左侧题目开始练习。</div>';return;}
  const s=statusOf(q),book=progress.bookmarks.includes(q.id);
+ const sourceAuditNote=(window.DM2_SOLUTIONS||{})[q.id]?.sourceNote||"";
  const solution=q.solution_pages?("第 "+q.solution_pages+" 页"):"未标注";
  const solutionHtml=showSolutions?renderSolution(q):'<section class="solution-missing">先做题模式已开启：请先独立写出定义、证明路线和关键步骤。完成后点击“显示参考解析”进行对照。</section>';
  const figureNote=q.has_figure?(solutionDataHasDiagram(q.id)?'<div class="figure-note">原题包含图形；下方配有根据原始资料重绘的示意图，便于跟随步骤理解。</div>':'<div class="figure-note">原题包含图形或关系图。当前题目尚无可靠重绘图，请以原始资料为准，不根据 OCR 猜测图形。</div>'):"";
  $("detailPanel").innerHTML=
- '<div class="detail-top"><span class="detail-id">'+esc(q.id)+'</span><span class="chip '+(isReview(q)?'amber':'green')+'">'+(isReview(q)?"需要核对":"题干已整理")+'</span></div>'+
+ '<div class="detail-top"><span class="detail-id">'+esc(q.id)+'</span><span class="chip '+(isReview(q)?'amber':'green')+'">'+(isReview(q)?"需要核对":"题干已整理")+'</span>'+(sourceAuditNote?'<span class="chip green">附原页审校记录</span>':'<span class="chip">尚待逐页审校</span>')+'</div>'+
  '<h2>'+esc(q.title)+'</h2>'+
  '<div class="detail-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip">'+esc(q.difficulty||"未标定")+'</span><span class="chip">'+esc(q.year||"未标年份")+'</span></div>'+
  '<div class="prompt-label">QUESTION / 题目</div><div class="prompt">'+richText(q.prompt)+'</div>'+
@@ -279,7 +280,7 @@ function renderDetail(){
  '<div class="solve-head"><b>我的解题笔记</b><span>自动保存在当前浏览器</span></div>'+
  '<textarea class="draft" id="draftInput" placeholder="记录你自己的思路、卡住的步骤、证明草稿或复习提醒…">'+esc(progress.drafts[q.id]||"")+'</textarea>'+
  '<div class="actions"><button class="btn" id="solutionToggleBtn">'+(showSolutions?"隐藏参考解析":"显示参考解析")+'</button><button class="btn primary '+(s==="mastered"?"selected":"")+'" id="masterBtn">'+(s==="mastered"?"✓ 已掌握":"标记已掌握")+'</button><button class="btn '+(s==="wrong"?"wrong-selected":"")+'" id="wrongBtn">'+(s==="wrong"?"↺ 已加入错题":"加入错题本")+'</button><button class="btn '+(book?"selected":"")+'" id="bookmarkBtn">'+(book?"★ 已收藏":"☆ 收藏")+'</button><button class="btn" id="clearBtn">清除状态</button></div>'+
- '<details class="source"><summary>题目来源与校对信息</summary><div class="source-body"><strong>来源文件：</strong>'+esc(q.source_file||"未标注")+'<br><strong>题目页码：</strong>'+esc(q.question_page??"未标注")+'<br><strong>参考解答页码：</strong>'+esc(solution)+'<br><strong>来源类型：</strong>'+esc(q.source_type||"未标注")+'<br><strong>知识点：</strong>'+esc((q.topics||[]).join("、"))+'<br><strong>校对备注：</strong>'+esc(q.review_status||"无")+'</div></details>'+
+ '<details class="source"><summary>题目来源与校对信息</summary><div class="source-body"><strong>来源文件：</strong>'+esc(q.source_file||"未标注")+'<br><strong>题目页码：</strong>'+esc(q.question_page??"未标注")+'<br><strong>参考解答页码：</strong>'+esc(solution)+'<br><strong>来源类型：</strong>'+esc(q.source_type||"未标注")+'<br><strong>知识点：</strong>'+esc((q.topics||[]).join("、"))+'<br><strong>整理阶段说明：</strong>'+esc(q.review_status||"无")+'<br><strong>逐页审校记录：</strong>'+esc(sourceAuditNote||"当前尚无单题逐页审校记录，不能视为参考解答已完成独立复核。")+'</div></details>'+
  '<div class="detail-nav"><button id="prevBtn" '+(visible.findIndex(x=>x.id===q.id)<=0?"disabled":"")+' >← 上一道</button><button id="nextBtn" '+(visible.findIndex(x=>x.id===q.id)>=visible.length-1?"disabled":"")+' >下一道 →</button></div>';
  $("solutionToggleBtn").addEventListener("click",()=>{showSolutions=!showSolutions;$("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");renderDetail();});
  $("draftInput").addEventListener("input",e=>{progress.drafts[q.id]=e.target.value;persist();});
