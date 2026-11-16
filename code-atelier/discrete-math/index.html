@@ -207,7 +207,7 @@ function renderPptGuide(q){
   const lowConfidence=/回忆版|OCR|需对照|缺失|指定子集/.test(item.prompt)||item.id==="DM2-FINAL-2025-Q07";
   return '<a href="./?q='+encodeURIComponent(id)+'">'+esc(item.title||id)+'</a>'+(lowConfidence?' <small>（回忆版，题干需核验）</small>':'');
  }).filter(Boolean);
- const refs='<b>'+(guide.isRecent?'近期原题：':guide.isGraphReview?'复习题原文：':'课程依据：')+'</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>题目来源：</b>'+esc(guide.review.name||"总复习.pdf")+' 第 '+guide.review.page+' 页';
+ const refs='<b>'+(guide.isRecent?'近期原题：':guide.isGraphReview?'课程课件依据：':'作业讲解来源：')+'</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>'+(guide.isGraphReview?'复习题原文：':'课程总复习：')+'</b>'+esc(guide.review.name||"总复习.pdf")+' 第 '+guide.review.page+' 页';
  return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">'+(guide.isRecent?'2025—2026 期末回忆版':guide.isGraphReview?'2022 图论复习题':'2025 秋作业')+'</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
   '<div class="ppt-reference">'+refs+'</div>'+
   '<div class="ppt-definition"><b>课件中的核心定义 / 定理：</b><br>'+richText(guide.definition)+'</div>'+
