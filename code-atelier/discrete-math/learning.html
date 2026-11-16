@@ -71,6 +71,8 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
 <section class="pane" id="pane-resources">
  <div class="section-head"><div><h2>资料资产清单</h2><p>资料不等于都要立刻刷。先区分核心、补充、扩展和不并入主线的材料。</p></div></div>
  <div class="resource-grid" id="resourceGrid"></div>
+ <div class="section-head"><div><h2>题干与 OCR 校对记录</h2><p>记录有来源依据的符号恢复、原稿笔误和无法确认的扫描缺失；不把推测写成原题。</p></div></div>
+ <div class="grid" id="auditGrid"></div>
 </section>
 
 <section class="pane" id="pane-variants">
@@ -159,6 +161,9 @@ function renderExams(){
 function renderResources(){
  $("resourceGrid").innerHTML=D.resources.map(r=>'<article class="card resource-card"><div><h3>'+esc(r.title)+'</h3><div class="meta">'+esc(r.kind)+'</div><p>'+esc(r.use)+'</p><div class="caution">'+esc(r.caution)+'</div></div><div class="count">'+esc(r.count)+'</div></article>').join("");
 }
+function renderAudit(){
+ $("auditGrid").innerHTML=(D.auditNotes||[]).map(a=>'<article class="card"><div class="meta">'+esc(a.source)+'</div><h3>'+esc(a.id)+' · '+esc(a.title)+'</h3><p>'+esc(a.note)+'</p></article>').join("");
+}
 function renderVariants(){
  $("variantGrid").innerHTML=D.variants.map(v=>'<article class="variant"><span class="pill amber">AI 拓展 · 非原题</span><h3>'+esc(v.id)+' · '+esc(v.topic)+'</h3><div class="source">基于 '+esc(v.from)+'</div><div class="prompt">'+esc(v.prompt)+'</div><details><summary>查看参考答案与提示</summary><p><b>提示：</b>'+esc(v.hint)+'</p><p><b>答案：</b>'+esc(v.answer)+'</p></details></article>').join("");
 }
@@ -170,7 +175,7 @@ function renderSupplemental(filter=""){
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("active",p.id==="pane-"+b.dataset.tab));}));
 $("methodSearch").addEventListener("input",e=>renderMethods(e.target.value));
 $("suppSearch").addEventListener("input",e=>renderSupplemental(e.target.value));
-renderModules();renderPaths();renderMethods();renderExams();renderResources();renderVariants();renderSupplemental();
+renderModules();renderPaths();renderMethods();renderExams();renderResources();renderAudit();renderVariants();renderSupplemental();
 
 /* Relation checker: exact definitions on A={1,2,3}. */
 const presets={
