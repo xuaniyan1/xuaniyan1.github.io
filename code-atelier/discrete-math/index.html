@@ -68,7 +68,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 </header>
 <section class="hero">
  <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，按老师课件的“知识点 → 定义 → 证明路线 → 完整解析”逐题精讲。进度和草稿保存在当前浏览器。</p></div>
- <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="solutionModeBtn">先做题模式：开</button><button class="btn" id="resetFilters">重置筛选</button><a class="btn" href="https://github.com/xuaniyan1/xuaniyan1.github.io/blob/main/code-atelier/discrete-math/AUDIT_2025.md" target="_blank" rel="noopener noreferrer">查看原题审校记录 ↗</a></div>
+ <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="solutionModeBtn">先做题模式：开</button><button class="btn" id="resetFilters">重置筛选</button><button class="btn" id="backupProgress">导出当前进度</button><a class="btn" href="https://github.com/xuaniyan1/xuaniyan1.github.io/blob/main/code-atelier/discrete-math/AUDIT_2025.md" target="_blank" rel="noopener noreferrer">查看原题审校记录 ↗</a></div>
 </section>
 <div id="cloudAccount" class="cloud-panel" aria-live="polite"></div>
 <section class="stats">
@@ -333,6 +333,16 @@ async function init(){
   ["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).addEventListener("change",renderList));
   $("statusList").querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.status)));
   $("resetFilters").addEventListener("click",resetFilters);
+  $("backupProgress").addEventListener("click",()=>{
+    const payload={exportedAt:new Date().toISOString(),section:"homework",progress};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;a.download="code-atelier-discrete-progress.json";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),0);
+    toast("当前进度备份已导出");
+  });
   $("randomBtn").addEventListener("click",()=>{if(!visible.length){toast("当前筛选下没有题目");return;}selectedId=visible[Math.floor(Math.random()*visible.length)].id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";renderList();});
  
   if(window.DM2Cloud) window.DM2Cloud.register({
