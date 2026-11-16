@@ -142,7 +142,7 @@ function renderList(){
  if(!visible.some(q=>q.id===selectedId))selectedId=visible[0].id;
  $("questionList").innerHTML=visible.map(q=>{
   const s=statusOf(q),review=isReview(q),book=progress.bookmarks.includes(q.id);
-  return '<article class="q-card '+(q.id===selectedId?'active':'')+'" data-id="'+esc(q.id)+'"><div class="q-title">'+esc(q.title)+'</div><div class="q-meta"><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span>'+(s==="mastered"?'<span class="chip green">已掌握</span>':s==="wrong"?'<span class="chip red">待复习</span>':'')+(review?'<span class="chip amber">待核对</span>':'')+(book?'<span class="chip">★ 收藏</span>':'')+'</div></article>';
+  return '<article class="q-card '+(q.id===selectedId?'active':'')+'" data-id="'+esc(q.id)+'"><div class="q-title">'+esc(q.title)+'</div><div class="q-meta"><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip green">分步解析</span>'+(s==="mastered"?'<span class="chip green">已掌握</span>':s==="wrong"?'<span class="chip red">待复习</span>':'')+(review?'<span class="chip amber">待核对</span>':'')+(book?'<span class="chip">★ 收藏</span>':'')+'</div></article>';
  }).join("");
  $("questionList").querySelectorAll("[data-id]").forEach(el=>el.addEventListener("click",()=>{selectedId=el.dataset.id;renderList();}));
  renderDetail();
