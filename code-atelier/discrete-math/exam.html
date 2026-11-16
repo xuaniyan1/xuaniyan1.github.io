@@ -243,6 +243,16 @@ $("downloadProgress").addEventListener("click",()=>{
 });
 $("sourcePolicy").innerHTML='<div class="tagrow"><span class="label green">题目来源可追溯</span><span class="label amber">争议不自动判分</span><span class="label blue">补写解析独立标明</span></div><p class="soft">'+esc(D.description)+'</p><div class="divider"></div>'+years.map(y=>'<p class="soft"><b>'+esc(y)+'</b> · '+esc(D.years[y].source)+'<br>来源详情：'+esc(D.years[y].detail)+'<br>解答依据：'+esc(D.years[y].answerSource)+'</p>').join("");
 $("auditList").innerHTML=D.warnings.map((w,i)=>'<article class="audit-card"><span class="label amber">待复核 '+(i+1)+'</span><h3>'+esc(w.source)+'</h3><p><b>问题：</b>'+esc(w.issue)+'</p><p><b>处理：</b>'+esc(w.why)+'</p></article>').join("");
+if(typeof location!=="undefined"){
+ const params=new URLSearchParams(location.search);
+ const requested=params.get("q");
+ const requestedYear=params.get("year");
+ if(requested&&byId[requested]&&byId[requested].kind==="tf"&&byId[requested].gradable!==false){
+  selected=requested;$("year").value=byId[requested].year;
+ }else if(requestedYear&&years.includes(requestedYear)){$("year").value=requestedYear;}
+ const requestedTopic=params.get("topic");
+ if(requestedTopic&&topics.includes(requestedTopic))$("topic").value=requestedTopic;
+}
 renderStats();renderPractice();renderProof();
 })();
 </script></body></html>
