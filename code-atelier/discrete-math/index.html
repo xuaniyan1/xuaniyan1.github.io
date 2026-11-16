@@ -23,16 +23,31 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 @media(max-width:1120px){.workbench{grid-template-columns:205px minmax(260px,340px) minmax(0,1fr)}.detail{padding:18px}.shell{padding:0 16px}}
 @media(max-width:920px){.workbench{grid-template-columns:205px minmax(0,1fr)}.detail{grid-column:1/-1;position:static}.question-list{max-height:560px}.side{position:static}}
 @media(max-width:620px){.shell{padding:0 12px}.nav{gap:10px;font-size:10px}.hero{display:block;padding-top:24px}.hero-actions{margin-top:13px}.stats{grid-template-columns:repeat(2,1fr)}.workbench{grid-template-columns:1fr}.side{position:static}.unit-list{grid-template-columns:1fr 1fr}.detail{grid-column:auto;padding:16px}.question-list{max-height:460px}.detail h2{font-size:18px}footer{flex-direction:column;gap:7px}}
+
+.ppt-guide{background:#fbfdfb;border:1px solid #dceadd;border-left:3px solid #3b8060;border-radius:12px;padding:15px;margin:16px 0}
+.ppt-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}
+.ppt-head strong{font-size:13px;color:#295b40}.ppt-tag{background:#ebf3ed;color:#376c4b;border-radius:6px;font-size:10px;padding:4px 7px;font-weight:700}
+.ppt-reference{font-size:10px;color:#72847a;line-height:1.85;margin:4px 0 12px}
+.ppt-definition{font-size:12px;line-height:1.9;color:#455b4c;margin:9px 0 11px;padding:10px 12px;background:#f1f7f1;border-radius:9px}
+.ppt-guide details{border-top:1px solid #e0e8df;padding:10px 2px}
+.ppt-guide summary{cursor:pointer;font-size:11px;font-weight:800;color:#316647;line-height:1.8}
+.ppt-guide details p{font-size:12px;line-height:1.85;color:#4d6554;margin:10px 0 3px}
+.ppt-related{font-size:11px;line-height:1.9;margin:11px 0 0}
+.ppt-related a{color:#226842;text-decoration:underline;text-underline-offset:2px}
+.ppt-warning{margin:10px 0 0;padding:9px 11px;border:1px solid #eee3c9;border-radius:8px;background:#fff9ee;color:#866737;font-size:11px;line-height:1.8}
+.recent-strip{background:#fff;border:1px solid #e1e9e0;border-radius:12px;padding:13px 15px;margin:0 0 15px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.recent-strip strong{font-size:12px}.recent-strip p{color:#78857b;font-size:11px;line-height:1.7;margin:5px 0 0}
+.recent-strip a{font-size:11px;font-weight:800;color:#28694c}
 </style>
 </head>
 <body>
 <div class="shell">
 <header>
  <a class="brand" href="../"><span class="mark">CA</span><span>Code Atelier<small>PERSONAL PRACTICE SPACE</small></span></a>
- <nav class="nav"><a href="../">总首页</a><a href="./learning.html">学习地图</a><a href="./exam.html">历年真题</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
+ <nav class="nav"><a href="../">总首页</a><a href="./learning.html">学习地图</a><a href="./exam.html">历史真题</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
 </header>
 <section class="hero">
- <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，逐题查看参考解答思路、完整推导与易错点。进度和草稿保存在当前浏览器。</p></div>
+ <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，按老师课件的“知识点 → 定义 → 证明路线 → 完整解析”逐题精讲。进度和草稿保存在当前浏览器。</p></div>
  <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="solutionModeBtn">先做题模式：关</button><button class="btn" id="resetFilters">重置筛选</button></div>
 </section>
 <section class="stats">
@@ -41,6 +56,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
  <div class="stat"><strong id="wrongStat">0</strong><span>错题待复习</span></div>
  <div class="stat"><strong id="bookmarkStat">0</strong><span>已收藏</span></div>
 </section>
+<div class="recent-strip"><div><strong>当前主线：2025 秋季课程作业（40 题）</strong><p>配合《总复习》和 2025 年作业课件式参考答案学习。2025—2026 期末回忆版只有部分题干可完整确认，单独作为近年考点联系。</p></div><a href="./?q=DM2-FINAL-2025-Q02">查看近期回忆版相关题 ↗</a></div>
 <section class="workbench">
  <aside class="panel side">
   <h3 class="panel-title">课程知识地图</h3>
@@ -80,6 +96,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <div class="toast" id="toast"></div>
 <script src="./questions-data.js"></script>
 <script src="./solutions-data.js"></script>
+<script src="./ppt-guides.js"></script>
 <script src="./exam-data.js"></script>
 <script>
 (()=>{
@@ -164,6 +181,25 @@ function renderList(){
  renderDetail();
 }
 function richText(value){return esc(value??"").replace(/\n/g,"<br>");}
+function renderPptGuide(q){
+ const guide=window.DM2_PPT_GUIDE?.guides?.[q.id];
+ if(!guide)return "";
+ const recent=(guide.relatedRecent||[]).map(id=>{
+  const item=questions.find(x=>x.id===id);
+  if(!item)return "";
+  const lowConfidence=/回忆版|OCR|需对照|缺失|指定子集/.test(item.prompt)||item.id==="DM2-FINAL-2025-Q07";
+  return '<a href="./?q='+encodeURIComponent(id)+'">'+esc(item.title||id)+'</a>'+(lowConfidence?' <small>（回忆版，题干需核验）</small>':'');
+ }).filter(Boolean);
+ const refs='<b>原课件：</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>总复习：</b>'+esc(guide.review.name)+' 第 '+guide.review.page+' 页';
+ return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">2025 秋作业</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
+  '<div class="ppt-reference">'+refs+'</div>'+
+  '<div class="ppt-definition"><b>课件中的核心定义 / 定理：</b><br>'+richText(guide.definition)+'</div>'+
+  '<details><summary>提示 1 · 我应该从哪里开始想？</summary><p>'+richText(guide.firstStep)+'</p></details>'+
+  '<details><summary>提示 2 · 老师的证明路线是什么？</summary><p>'+richText(guide.method)+'</p></details>'+
+  (guide.pitfall?'<div class="ppt-warning"><b>课件对照提醒：</b>'+richText(guide.pitfall)+'</div>':'')+
+  (recent.length?'<div class="ppt-related"><b>2025—2026 期末回忆题的对应考点：</b><br>'+recent.join('　')+'</div>':'')+
+  '</section>';
+}
 function renderSolution(q){
  const solutionData=(window.DM2_SOLUTIONS||{})[q.id];
  if(!solutionData)return '<section class="solution-missing">这道题的逐步解析正在整理，暂时不展示未经核对的答案。</section>';
@@ -196,6 +232,7 @@ function renderDetail(){
  '<div class="detail-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip">'+esc(q.difficulty||"未标定")+'</span><span class="chip">'+esc(q.year||"未标年份")+'</span></div>'+
  '<div class="prompt-label">QUESTION / 题目</div><div class="prompt">'+richText(q.prompt)+'</div>'+
  figureNote+
+ renderPptGuide(q)+
  solutionHtml+
  relatedExamHtml(q)+
  '<div class="solve-head"><b>我的解题笔记</b><span>自动保存在当前浏览器</span></div>'+
