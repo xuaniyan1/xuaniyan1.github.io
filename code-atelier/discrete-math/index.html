@@ -103,6 +103,7 @@ let toastTimer;
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),1800);}
 function isReview(q){return /待校对|待人工|需对照|OCR 不完整|OCR缺失|需核对|暂未/.test(q.review_status||"");}
 function statusOf(q){return progress.status[q.id]||"todo";}
+function assignmentLabel(q){const m=q.id.match(/^DM2-HW(\\d+)-/);return m?"第"+Number(m[1])+"次作业"+(q.year==="2024秋"?" · 2024秋":""):q.id.includes("FINAL")?"期末回忆版":"";}
 function renderStats(){
  $("totalStat").textContent=questions.length;
  $("masteredStat").textContent=Object.values(progress.status).filter(x=>x==="mastered").length;
@@ -124,7 +125,7 @@ function refreshSelects(){
  ];
  const el=$("assignmentSelect"),old=el.value;
  el.innerHTML='<option value="">全部作业 / 试卷</option>'+assignmentOptions.map(([label,value])=>'<option value="'+value+'">'+label+'</option>').join("");
- if(assignmentOptions.some(([,value])=>value===old))el.value=old;
+ if(assignmentOptions.some(([,value])=>value===old))el.value=old;else el.value="2025";
  fillSelect("typeSelect",[...new Set(questions.map(q=>q.type).filter(Boolean))].sort(),"全部题型");
  fillSelect("difficultySelect",[...new Set(questions.map(q=>q.difficulty).filter(Boolean))].sort(),"全部难度");
  fillSelect("yearSelect",[...new Set(questions.map(q=>q.year).filter(Boolean))].sort(),"全部来源年份");
@@ -156,7 +157,7 @@ function renderList(){
  if(!visible.some(q=>q.id===selectedId))selectedId=visible[0].id;
  $("questionList").innerHTML=visible.map(q=>{
   const s=statusOf(q),review=isReview(q),book=progress.bookmarks.includes(q.id);
-  return '<article class="q-card '+(q.id===selectedId?'active':'')+'" data-id="'+esc(q.id)+'"><div class="q-title">'+esc(q.title)+'</div><div class="q-meta"><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip green">分步解析</span>'+(s==="mastered"?'<span class="chip green">已掌握</span>':s==="wrong"?'<span class="chip red">待复习</span>':'')+(review?'<span class="chip amber">待核对</span>':'')+(book?'<span class="chip">★ 收藏</span>':'')+'</div></article>';
+  return '<article class="q-card '+(q.id===selectedId?'active':'')+'" data-id="'+esc(q.id)+'"><div class="q-title">'+esc(q.title)+'</div><div class="q-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip green">分步解析</span>'+(s==="mastered"?'<span class="chip green">已掌握</span>':s==="wrong"?'<span class="chip red">待复习</span>':'')+(review?'<span class="chip amber">待核对</span>':'')+(book?'<span class="chip">★ 收藏</span>':'')+'</div></article>';
  }).join("");
  $("questionList").querySelectorAll("[data-id]").forEach(el=>el.addEventListener("click",()=>{selectedId=el.dataset.id;renderList();}));
  renderDetail();
@@ -185,7 +186,7 @@ function renderDetail(){
  $("detailPanel").innerHTML=
  '<div class="detail-top"><span class="detail-id">'+esc(q.id)+'</span><span class="chip '+(isReview(q)?'amber':'green')+'">'+(isReview(q)?"需要核对":"题干已整理")+'</span></div>'+
  '<h2>'+esc(q.title)+'</h2>'+
- '<div class="detail-meta"><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip">'+esc(q.difficulty||"未标定")+'</span><span class="chip">'+esc(q.year||"未标年份")+'</span></div>'+
+ '<div class="detail-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip">'+esc(q.difficulty||"未标定")+'</span><span class="chip">'+esc(q.year||"未标年份")+'</span></div>'+
  '<div class="prompt-label">QUESTION / 题目</div><div class="prompt">'+richText(q.prompt)+'</div>'+
  figureNote+
  solutionHtml+
@@ -204,7 +205,7 @@ function renderDetail(){
 function solutionDataHasDiagram(id){return !!((window.DM2_SOLUTIONS||{})[id]||{}).diagram;}
 function move(delta){const i=visible.findIndex(q=>q.id===selectedId),n=i+delta;if(n>=0&&n<visible.length){selectedId=visible[n].id;renderList();}}
 function setStatus(s){activeStatus=s;$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status===s));renderList();}
-function resetFilters(){activeUnit="";activeStatus="all";$("searchInput").value="";["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).value="");$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="all"));renderUnits();renderList();}
+function resetFilters(){activeUnit="";activeStatus="all";$("searchInput").value="";$("assignmentSelect").value="2025";["typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).value="");$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="all"));renderUnits();renderList();}
 async function init(){
  try{
   if(!window.DM2_DATA_B64)throw new Error("题库数据文件没有加载。");
