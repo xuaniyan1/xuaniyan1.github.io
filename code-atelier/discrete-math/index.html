@@ -147,7 +147,7 @@ function renderList(){
  $("questionList").querySelectorAll("[data-id]").forEach(el=>el.addEventListener("click",()=>{selectedId=el.dataset.id;renderList();}));
  renderDetail();
 }
-function richText(value){return esc(value??"").replace(/\\n/g,"<br>");}
+function richText(value){return esc(value??"").replace(/\n/g,"<br>");}
 function renderSolution(q){
  const solutionData=(window.DM2_SOLUTIONS||{})[q.id];
  if(!solutionData)return '<section class="solution-missing">这道题的逐步解析正在整理，暂时不展示未经核对的答案。</section>';
