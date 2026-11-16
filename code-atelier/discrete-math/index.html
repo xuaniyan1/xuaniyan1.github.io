@@ -190,13 +190,14 @@ function renderPptGuide(q){
   const lowConfidence=/回忆版|OCR|需对照|缺失|指定子集/.test(item.prompt)||item.id==="DM2-FINAL-2025-Q07";
   return '<a href="./?q='+encodeURIComponent(id)+'">'+esc(item.title||id)+'</a>'+(lowConfidence?' <small>（回忆版，题干需核验）</small>':'');
  }).filter(Boolean);
- const refs='<b>原课件：</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>总复习：</b>'+esc(guide.review.name)+' 第 '+guide.review.page+' 页';
- return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">2025 秋作业</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
+ const refs='<b>'+(guide.isRecent?'近期原题：':'原课件：')+'</b>'+esc(guide.ppt.name)+' 第 '+guide.ppt.page+' 页　 <b>总复习：</b>'+esc(guide.review.name)+' 第 '+guide.review.page+' 页';
+ return '<section class="ppt-guide"><div class="ppt-head"><strong>跟着课程课件做这道题</strong><span class="ppt-tag">'+(guide.isRecent?'2025—2026 期末回忆版':'2025 秋作业')+'</span><span class="ppt-tag">定义 → 方法 → 证明</span></div>'+
   '<div class="ppt-reference">'+refs+'</div>'+
   '<div class="ppt-definition"><b>课件中的核心定义 / 定理：</b><br>'+richText(guide.definition)+'</div>'+
   '<details><summary>提示 1 · 我应该从哪里开始想？</summary><p>'+richText(guide.firstStep)+'</p></details>'+
   '<details><summary>提示 2 · 老师的证明路线是什么？</summary><p>'+richText(guide.method)+'</p></details>'+
   (guide.pitfall?'<div class="ppt-warning"><b>课件对照提醒：</b>'+richText(guide.pitfall)+'</div>':'')+
+  (guide.isRecent?'<div class="ppt-warning">2025—2026 资料来自一页回忆版；这里是根据原题和课程课件给出的讲解，并非官方标准答案。</div>':'')+
   (recent.length?'<div class="ppt-related"><b>2025—2026 期末回忆题的对应考点：</b><br>'+recent.join('　')+'</div>':'')+
   '</section>';
 }
