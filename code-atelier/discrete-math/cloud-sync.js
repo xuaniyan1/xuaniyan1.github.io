@@ -101,7 +101,8 @@
 
     var e = sections.values().next().value;
     var guest = e ? jsonGet(e.legacyKey, e.empty()) : null;
-    var showImport = e && hasProgress(e.section, guest) && e.loaded && !e.conflict;
+    var showImport = e && hasProgress(e.section, guest) && e.loaded && !e.conflict &&
+      localStorage.getItem(cacheKey(e) + ".guestImported") !== "1";
     var trouble = e && e.conflict;
     var warning = e && e.warning ? e.warning : "";
     root.innerHTML = '<div class="cloud-row"><b>已登录 · ' + esc(user.email || user.id.slice(0, 8)) + '</b>' +
@@ -122,6 +123,7 @@
       var old = jsonGet(e.legacyKey, e.empty());
       e.apply(e.merge(current, old));
       jsonSet(cacheKey(e), e.snapshot());
+      try { localStorage.setItem(cacheKey(e) + ".guestImported", "1"); } catch (_) {}
       changed(e.section);
       show("正在合并游客记录并同步……");
     });
@@ -173,6 +175,7 @@
     e.conflict = null;
     e.warning = "";
     if (e.timer) { clearTimeout(e.timer); e.timer = null; }
+    e.queuedWhileSending = false;
     if (!user) {
       e.sending = false;
       e.revision = null;
@@ -249,7 +252,7 @@
         client = window.supabase.createClient(cfg.url, cfg.publishableKey);
         render();
         var auth = await client.auth.getUser();
-        if (auth.error && auth.error.name !== "AuthSessionMissingError") throw auth.error;
+        if (auth.error && auth.error.name !== "AuthSessionMissingError" && auth.error.code !== "session_not_found") throw auth.error;
         await setUser(auth.data && auth.data.user ? auth.data.user : null);
         client.auth.onAuthStateChange(function (event) {
           if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_DELETED") {
@@ -275,6 +278,7 @@
     var e = sections.get(section);
     if (!e || !user) return;
     jsonSet(cacheKey(e), e.snapshot());
+    if(e.sending) e.queuedWhileSending = true;
     try { localStorage.setItem(dirtyKey(e), "1"); }
     catch (_) { e.warning = "本机存储不可写，进度可能丢失"; }
     if (e.loaded) schedule(e, 900);
@@ -311,7 +315,7 @@
         row = created.data;
       } else {
         var updated = await table.update({
-          state: snapshot, revision: e.revision + 1
+          state: snapshot, revision: Number(e.revision) + 1
         }).eq("user_id", identity).eq("section", e.section)
           .eq("revision", e.revision).select("revision").maybeSingle();
         if (updated.error) throw updated.error;
@@ -348,6 +352,10 @@
       }
     } finally {
       e.sending = false;
+      if (e.queuedWhileSending && user && user.id === identity && !e.conflict) {
+        e.queuedWhileSending = false;
+        schedule(e, 350);
+      }
       render();
     }
   }
