@@ -280,7 +280,7 @@ async function init(){
   questions=[...(data.questions||[]).map(q=>{const patch=(window.DM2_QUESTION_PATCHES||{})[q.id]||{};const merged={...q,...patch};return {...merged,normalizedUnit:normalizeUnit(merged.unit||q.unit)};}),...(window.DM2_EXTRA_QUESTIONS||[]).map(q=>({...q,normalizedUnit:normalizeUnit(q.unit||q.chapter)}))];
   renderStats();renderUnits();refreshSelects();
   const requestedId=new URLSearchParams(location.search).get("q");
-  if(requestedId&&questions.some(q=>q.id===requestedId)){selectedId=requestedId;if(requestedId.startsWith("DM2-GR2022-"))$("assignmentSelect").value="GRAPH2022";else {const m=requestedId.match(/^DM2-(HW\\d+|FINAL)-/);if(m)$("assignmentSelect").value=m[1];}}
+  if(requestedId&&questions.some(q=>q.id===requestedId)){selectedId=requestedId;if(requestedId.startsWith("DM2-GR2022-"))$("assignmentSelect").value="GRAPH2022";else {const code=requestedId.split("-")[1];if(code==="FINAL"||(code.startsWith("HW")&&code.length===4))$("assignmentSelect").value=code;}}
   renderList();
   $("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");
   $("solutionModeBtn").addEventListener("click",()=>{showSolutions=!showSolutions;$("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");renderDetail();});
