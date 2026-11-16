@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2f4ef">
+<title>离散数学 2 · 学习地图与证明实验室</title>
+<meta name="description" content="基于课程作业、总复习、图论专题和历年试题构建的离散数学学习地图、证明方法库与关系实验室。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f4ef;--paper:#fff;--ink:#202a24;--muted:#7a867d;--line:#e5eae3;--green:#2d694f;--green-soft:#eaf2ec;--blue:#4b6e7b;--blue-soft:#edf3f5;--amber:#9b6b27;--amber-soft:#faf2e4;--red:#9a5149;--red-soft:#f8eeec;--shadow:0 12px 36px rgba(37,54,42,.055)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans","Noto Sans SC",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.shell{max-width:1320px;margin:auto;padding:0 22px}
+header{height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dfe6de}.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.04em}.mark{width:33px;height:33px;border-radius:11px;background:#254e3d;color:white;display:grid;place-items:center;font-size:12px}.brand small{display:block;color:#8a958b;font-size:9px;letter-spacing:.14em;margin-top:2px}.nav{display:flex;gap:18px;font-size:12px;color:#7b867e;font-weight:700}.nav a:hover,.nav a.active{color:var(--green)}
+.hero{padding:32px 0 20px;display:flex;justify-content:space-between;align-items:end;gap:22px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--green)}h1{font-size:31px;letter-spacing:-.055em;margin:8px 0 7px}.hero p{font-size:12px;color:var(--muted);line-height:1.9;margin:0;max-width:760px}.hero-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;color:#536157;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:700}.btn:hover{border-color:#b9cabe;color:var(--green)}.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:5px 0 16px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px 15px}.stat strong{font-size:23px;letter-spacing:-.05em;display:block}.stat span{font-size:10px;color:#89938b}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 14px;padding:6px;background:#e9eee7;border-radius:12px}.tab{border:0;background:transparent;color:#758177;border-radius:8px;padding:9px 13px;font-size:11px;font-weight:800}.tab.active{background:#fff;color:var(--green);box-shadow:0 2px 8px #273c2b0d}.pane{display:none}.pane.active{display:block}.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:18px 0 12px}.section-head h2{font-size:18px;letter-spacing:-.04em;margin:0}.section-head p{font-size:11px;color:#879187;margin:4px 0 0;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);min-width:0}.card h3{font-size:13px;margin:0 0 7px;letter-spacing:-.02em}.card p{font-size:11px;line-height:1.8;color:#69766d;margin:6px 0}.card .meta{font-size:9px;color:#89948b;line-height:1.7;margin-bottom:8px}.pill{display:inline-block;border-radius:5px;background:#f1f4f0;color:#738077;font-size:9px;padding:4px 7px;margin:0 4px 5px 0}.pill.green{background:var(--green-soft);color:var(--green)}.pill.amber{background:var(--amber-soft);color:var(--amber)}.link-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.text-link{font-size:10px;font-weight:800;color:var(--green)}.text-link:hover{text-decoration:underline}.list{padding-left:17px;margin:8px 0;color:#5e6c62;font-size:11px;line-height:1.9}.path-card{border-left:3px solid #8eaa94}.step-list{display:grid;gap:7px;margin:11px 0}.step{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:11px;line-height:1.7;color:#536157}.step b{width:20px;height:20px;display:grid;place-items:center;border-radius:7px;background:var(--green-soft);color:var(--green);font-size:9px}
+.searchbar{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fff;font-size:11px;outline:none;margin-bottom:11px}.searchbar:focus,textarea:focus,select:focus{border-color:#9eb9a6;box-shadow:0 0 0 3px rgba(66,117,83,.08);outline:none}.method-card{display:flex;flex-direction:column}.method-card .bottom{margin-top:auto}.method-card summary,.variant summary{font-size:10px;font-weight:800;color:var(--green);cursor:pointer;padding-top:8px}.method-card details p,.variant details p{padding:8px 10px;background:#f7faf6;border-radius:8px;margin-top:8px}
+.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:13px}.table{width:100%;border-collapse:collapse;font-size:10px;min-width:780px}.table th,.table td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid #edf1eb;line-height:1.75}.table th{background:#f7f9f6;color:#69766d;font-size:9px;letter-spacing:.05em}.table td:first-child{font-weight:800;white-space:nowrap}.quality{display:inline-block;border-radius:5px;background:#f1f4f0;padding:3px 6px;color:#69766d;font-size:9px}
+.resource-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.resource-card{display:grid;grid-template-columns:1fr auto;gap:8px}.resource-card h3{margin:0}.resource-card .count{font-size:10px;color:var(--green);font-weight:800;white-space:nowrap}.caution{padding:8px 10px;border-radius:8px;background:var(--amber-soft);color:#856638;font-size:10px;line-height:1.7;margin-top:8px}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.lab{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);min-width:0}.lab h3{font-size:14px;margin:0 0 6px}.lab>p{font-size:10px;color:#7b877e;line-height:1.8;margin:0 0 12px}.lab label{display:block;font-size:10px;color:#69766d;font-weight:800;margin:9px 0 5px}.lab textarea{width:100%;min-height:72px;resize:vertical;border:1px solid var(--line);border-radius:9px;padding:10px;font-size:11px;line-height:1.7;color:#344239}.lab select{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;font-size:10px;color:#58665c}.lab-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.result{padding:10px;border-radius:9px;background:#f7faf6;margin-top:9px;font-size:10px;line-height:1.8;color:#526056}.result b{color:#334c3a}.good{color:#2d694f;font-weight:800}.bad{color:#9a5149;font-weight:800}.matrix{border-collapse:collapse;margin-top:10px;font-size:10px}.matrix th,.matrix td{border:1px solid #e4eae2;padding:6px 10px;text-align:center;min-width:30px}.matrix th{background:#f2f6f1}.witness{color:#8c6330}.hint{font-size:10px;color:#879187;line-height:1.7}.variant-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.variant{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px}.variant h3{font-size:12px;margin:0 0 6px}.variant .prompt{font-size:11px;line-height:1.85;color:#4f5d53}.variant .source{font-size:9px;color:#89948b;margin:7px 0}.footer{padding:24px 0 32px;color:#9aa39b;font-size:10px;display:flex;justify-content:space-between}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lab-grid{grid-template-columns:1fr}.hero{display:block}.hero-actions{margin-top:13px}}
+@media(max-width:620px){.shell{padding:0 12px}.nav{gap:10px;font-size:10px}.stats{grid-template-columns:repeat(2,1fr)}.grid,.resource-grid,.variant-grid{grid-template-columns:1fr}.tabs{display:grid;grid-template-columns:repeat(3,1fr)}.tab{padding:9px 5px}.footer{flex-direction:column;gap:7px}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+ <a class="brand" href="../"><span class="mark">CA</span><span>Code Atelier<small>DISCRETE MATHEMATICS II</small></span></a>
+ <nav class="nav"><a href="./">2025 作业题库</a><a class="active" href="./learning.html">学习地图</a><a href="../">总首页</a></nav>
+</header>
+<section class="hero">
+ <div><div class="eyebrow">SOURCE-GROUNDED STUDY SYSTEM</div><h1>离散数学 2 · 学习地图与证明实验室</h1><p>把 2025 秋作业、课程总复习、图论专题和历年试卷连接起来。这里区分课程原题、资料证据与 AI 拓展；不是把不同学年的题目混成一份题库。</p></div>
+ <div class="hero-actions"><a class="btn primary" href="./">回到 2025 作业刷题 ↗</a></div>
+</section>
+<section class="stats">
+ <div class="stat"><strong>40</strong><span>2025 秋作业核心题</span></div>
+ <div class="stat"><strong>11</strong><span>历年试卷/回忆版记录</span></div>
+ <div class="stat"><strong>17</strong><span>证明方法卡</span></div>
+ <div class="stat"><strong>2</strong><span>交互实验室</span></div>
+</section>
+<nav class="tabs" aria-label="学习地图导航">
+ <button class="tab active" data-tab="overview">课程地图</button>
+ <button class="tab" data-tab="methods">证明方法库</button>
+ <button class="tab" data-tab="exams">历年考频</button>
+ <button class="tab" data-tab="resources">资料资产</button>
+ <button class="tab" data-tab="variants">变式训练</button>
+ <button class="tab" data-tab="labs">交互实验室</button>
+</nav>
+
+<section class="pane active" id="pane-overview">
+ <div class="section-head"><div><h2>课程知识地图</h2><p>按《总复习.pdf》和知识点考频矩阵整理；题目入口仍指向对应原题。</p></div></div>
+ <div class="grid" id="moduleGrid"></div>
+ <div class="section-head"><div><h2>推荐学习路径</h2><p>不是按题量平均分配，而是按前置知识和证明能力递进。</p></div></div>
+ <div class="grid" id="pathGrid"></div>
+</section>
+
+<section class="pane" id="pane-methods">
+ <div class="section-head"><div><h2>证明方法库</h2><p>每张卡都回答三个问题：什么时候用、怎么写、最容易在哪里出错。</p></div></div>
+ <input class="searchbar" id="methodSearch" placeholder="搜索方法：反例、双向包含、关系性质、归纳法、Hamilton……">
+ <div class="grid" id="methodGrid"></div>
+</section>
+
+<section class="pane" id="pane-exams">
+ <div class="section-head"><div><h2>历年真题覆盖与资料质量</h2><p>数据来自资料包中的《历年真题覆盖目录.csv》。注意部分年份只有部分试题或答案整理稿。</p></div></div>
+ <div class="table-wrap"><table class="table"><thead><tr><th>年份 / 来源</th><th>覆盖内容</th><th>资料质量</th><th>使用提醒</th></tr></thead><tbody id="examBody"></tbody></table></div>
+ <div class="section-head"><div><h2>复习优先级</h2><p>来自资料包《知识点与考频矩阵.csv》，是资料整理者的建议优先级，不是统计意义上的精确出题概率。</p></div></div>
+ <div class="grid" id="priorityGrid"></div>
+</section>
+
+<section class="pane" id="pane-resources">
+ <div class="section-head"><div><h2>资料资产清单</h2><p>资料不等于都要立刻刷。先区分核心、补充、扩展和不并入主线的材料。</p></div></div>
+ <div class="resource-grid" id="resourceGrid"></div>
+</section>
+
+<section class="pane" id="pane-variants">
+ <div class="section-head"><div><h2>变式训练</h2><p>以下题目是根据课程原题设计的 AI 拓展练习，不是老师原题，也不计入 40 道作业题。</p></div></div>
+ <div class="variant-grid" id="variantGrid"></div>
+</section>
+
+<section class="pane" id="pane-labs">
+ <div class="section-head"><div><h2>交互实验室</h2><p>把抽象定义变成可操作的对象。实验结果是按定义计算，不替代书面证明。</p></div></div>
+ <div class="lab-grid">
+  <div class="lab">
+   <h3>关系性质检查器</h3>
+   <p>对应第三次作业第 1 题。默认 R₁–R₅ 来自原 PDF 的五张关系图/关系矩阵，顶点集合 A={1,2,3}。</p>
+   <label for="relationPreset">载入原题关系</label>
+   <select id="relationPreset">
+    <option value="R1">R₁：三个自环</option><option value="R2">R₂：1 自环，2↔3</option><option value="R3">R₃：有向三环</option><option value="R4">R₄：空关系</option><option value="R5">R₅：自环 + 1↔2 + 指向 3</option><option value="custom">自定义</option>
+   </select>
+   <label for="relationInput">关系中的有序偶（格式：1,1; 2,3; 3,2）</label>
+   <textarea id="relationInput" spellcheck="false">1,1; 2,2; 3,3</textarea>
+   <div class="lab-actions"><button class="btn primary" id="checkRelation">检查五种性质</button><button class="btn" data-closure="reflexive">自反闭包</button><button class="btn" data-closure="symmetric">对称闭包</button><button class="btn" data-closure="transitive">传递闭包</button></div>
+   <div id="relationResult" class="result">选择关系后点击“检查五种性质”。</div>
+   <div id="relationMatrix"></div>
+   <div id="closureResult" class="result" hidden></div>
+   <p class="hint">提醒：反对称允许单向边；只有 x≠y 且 xRy、yRx 同时成立时，才违反反对称性。</p>
+  </div>
+  <div class="lab">
+   <h3>偏序与 Hasse 图分析器</h3>
+   <p>对应第四次作业第 1 题。输入覆盖关系，程序自动补入自反边和传递边，再求极值元、上下界与确界。</p>
+   <label for="posetInput">覆盖关系（格式：x4,x2; x4,x3; x5,x3; x2,x1; x3,x1）</label>
+   <textarea id="posetInput" spellcheck="false">x4,x2; x4,x3; x5,x3; x2,x1; x3,x1</textarea>
+   <label for="subsetPreset">选择要分析的子集</label>
+   <select id="subsetPreset"><option value="x2,x3,x4">S₁={x₂,x₃,x₄}</option><option value="x3,x4,x5">S₂={x₃,x₄,x₅}</option><option value="x1,x2,x3">S₃={x₁,x₂,x₃}</option></select>
+   <div class="lab-actions"><button class="btn primary" id="checkPoset">分析偏序</button><button class="btn" id="resetPoset">恢复原题</button></div>
+   <div id="posetResult" class="result">点击“分析偏序”。</div>
+   <p class="hint">这里的边表示覆盖关系，不是完整的 ≤ 关系；程序会自动补齐传递关系。若输入产生有向环，就不是偏序。</p>
+  </div>
+ </div>
+</section>
+
+<footer class="footer"><span>CODE ATELIER · DISCRETE MATHEMATICS II</span><span>原题可追溯 · 方法可复用 · 拓展有标记</span></footer>
+</div>
+<script src="./learning-data.js"></script>
+<script>
+(()=>{"use strict";
+const D=window.DM2_LEARNING;if(!D)throw new Error("学习地图数据没有加载");
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const qlink=id=>'<a class="text-link" href="./?q='+encodeURIComponent(id)+'">'+esc(id)+' ↗</a>';
+function renderModules(){
+ $("moduleGrid").innerHTML=D.modules.map(m=>'<article class="card"><div class="meta">'+esc(m.source)+'</div><h3>'+esc(m.title)+'</h3><span class="pill '+(m.priority==="极高"?"green":m.priority==="高"?"amber":"")+'">'+esc(m.priority)+'</span><p>'+esc(m.dependency)+'</p><ul class="list">'+m.skills.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul><p><b>考试证据：</b>'+esc(m.exam)+'</p><div class="link-row">'+(m.questionIds.length?m.questionIds.slice(0,4).map(qlink).join(""):'<span class="hint">当前没有 2025 作业直连题目，作为历年/专题扩展</span>')+'</div></article>').join("");
+}
+function renderPaths(){
+ $("pathGrid").innerHTML=D.paths.map(p=>'<article class="card path-card"><h3>'+esc(p.title)+'</h3><div class="meta">'+esc(p.subtitle)+'</div><div class="step-list">'+p.steps.map((s,i)=>'<div class="step"><b>'+String(i+1).padStart(2,"0")+'</b><span>'+esc(s)+'</span></div>').join("")+'</div><p>'+esc(p.note)+'</p></article>').join("");
+}
+function renderMethods(filter=""){
+ const f=filter.trim().toLowerCase();
+ const rows=D.proofMethods.filter(m=>[m.title,m.when,m.example,m.trap,m.recipe.join(" ")].join(" ").toLowerCase().includes(f));
+ $("methodGrid").innerHTML=rows.map(m=>'<article class="card method-card"><div class="meta">'+esc(m.when)+'</div><h3>'+esc(m.title)+'</h3><ol class="list">'+m.recipe.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ol><p><b>原题例子：</b>'+esc(m.example)+'</p><p class="caution"><b>常见陷阱：</b>'+esc(m.trap)+'</p><div class="bottom"><div class="link-row">'+m.questionIds.map(qlink).join("")+'</div></div></article>').join("")||'<div class="card">没有找到匹配的方法卡。</div>';
+}
+function renderExams(){
+ $("examBody").innerHTML=D.exams.map(e=>'<tr><td>'+esc(e.year)+'<br><span class="hint">'+esc(e.file)+'</span></td><td>'+esc(e.coverage)+'</td><td><span class="quality">'+esc(e.quality)+'</span></td><td>'+esc(e.note)+'</td></tr>').join("");
+ const priorities=[
+  ["极高","二元关系；序关系与等价关系；函数；图论基本概念与连通性","关系闭包、Hasse 图、函数逆、图的连通分支在资料中反复出现。"],
+  ["高","集合论；自然数与基数；欧拉/Hamilton；图的矩阵表示；树与最优结构","是课程主干与历年综合题的稳定组成。"],
+  ["中高","最短路径与最小生成树算法","主要来自图论课件和软院历年题。"],
+  ["中","二分图与匹配","有软院 2018–2020 试题证据，先作为扩展。"],
+  ["扩展/待确认","平面图与染色","2022 图论复习材料包含 7.7；需先确认本学期范围。"]
+ ];
+ $("priorityGrid").innerHTML=priorities.map(x=>'<article class="card"><span class="pill '+(x[0]==="极高"?"green":x[0]==="高"?"amber":"")+'">'+esc(x[0])+'</span><h3>'+esc(x[1])+'</h3><p>'+esc(x[2])+'</p></article>').join("");
+}
+function renderResources(){
+ $("resourceGrid").innerHTML=D.resources.map(r=>'<article class="card resource-card"><div><h3>'+esc(r.title)+'</h3><div class="meta">'+esc(r.kind)+'</div><p>'+esc(r.use)+'</p><div class="caution">'+esc(r.caution)+'</div></div><div class="count">'+esc(r.count)+'</div></article>').join("");
+}
+function renderVariants(){
+ $("variantGrid").innerHTML=D.variants.map(v=>'<article class="variant"><span class="pill amber">AI 拓展 · 非原题</span><h3>'+esc(v.id)+' · '+esc(v.topic)+'</h3><div class="source">基于 '+esc(v.from)+'</div><div class="prompt">'+esc(v.prompt)+'</div><details><summary>查看参考答案与提示</summary><p><b>提示：</b>'+esc(v.hint)+'</p><p><b>答案：</b>'+esc(v.answer)+'</p></details></article>').join("");
+}
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("active",p.id==="pane-"+b.dataset.tab));}));
+$("methodSearch").addEventListener("input",e=>renderMethods(e.target.value));
+renderModules();renderPaths();renderMethods();renderExams();renderResources();renderVariants();
+
+/* Relation checker: exact definitions on A={1,2,3}. */
+const presets={
+ R1:[[1,1],[2,2],[3,3]],
+ R2:[[1,1],[2,3],[3,2]],
+ R3:[[1,2],[2,3],[3,1]],
+ R4:[],
+ R5:[[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,3]]
+};
+const pairKey=(a,b)=>a+","+b;
+function parsePairs(text,labels){
+ const out=new Set();const bits=text.split(/[;\n]+/).map(x=>x.trim()).filter(Boolean);
+ for(const bit of bits){const m=bit.match(/^\(?\s*([A-Za-z0-9_]+)\s*,\s*([A-Za-z0-9_]+)\s*\)?$/);if(!m)throw new Error("无法识别有序偶："+bit);if(!labels.includes(m[1])||!labels.includes(m[2]))throw new Error("元素必须来自："+labels.join(", "));out.add(pairKey(m[1],m[2]));}
+ return out;
+}
+function pairList(set){return [...set].map(k=>"("+k.replace(",",", ")+")").sort().join(", ")||"∅";}
+function relationMatrix(set,labels){
+ let html='<table class="matrix"><tr><th>R</th>'+labels.map(x=>'<th>'+esc(x)+'</th>').join("")+'</tr>';
+ for(const a of labels)html+='<tr><th>'+esc(a)+'</th>'+labels.map(b=>'<td>'+(set.has(pairKey(a,b))?"1":"0")+'</td>').join("")+'</tr>';
+ return html+'</table>';
+}
+function relationFacts(set,labels){
+ const has=(a,b)=>set.has(pairKey(a,b));let reflex=true,irref=true,sym=true,anti=true,trans=true;let witnesses={};
+ for(const a of labels){if(!has(a,a)){reflex=false;witnesses.reflex="缺少 ("+a+","+a+")";}if(has(a,a)){irref=false;witnesses.irreflex="存在自环 ("+a+","+a+")";}}
+ for(const a of labels)for(const b of labels){if(has(a,b)&&!has(b,a)){sym=false;witnesses.sym="有 "+a+"R"+b+"，但没有 "+b+"R"+a;}if(a!==b&&has(a,b)&&has(b,a)){anti=false;witnesses.anti="同时有 "+a+"R"+b+" 和 "+b+"R"+a+"，且 "+a+"≠"+b;}}
+ for(const a of labels)for(const b of labels)for(const c of labels)if(has(a,b)&&has(b,c)&&!has(a,c)){trans=false;witnesses.trans="有 "+a+"R"+b+"、"+b+"R"+c+"，但没有 "+a+"R"+c;}
+ return [
+  ["自反",reflex,witnesses.reflex],["反自反",irref,witnesses.irreflex],["对称",sym,witnesses.sym],["反对称",anti,witnesses.anti],["传递",trans,witnesses.trans]
+ ];
+}
+function renderRelation(){
+ try{
+  const set=parsePairs($("relationInput").value,["1","2","3"]),facts=relationFacts(set,["1","2","3"]);
+  $("relationResult").innerHTML='<b>关系：</b> '+esc(pairList(set))+'<br>'+facts.map(([name,ok,w])=>'<div><span class="'+(ok?"good":"bad")+'">'+name+'：'+(ok?"满足":"不满足")+'</span>'+(w?' <span class="witness">（'+esc(w)+'）</span>':'')+'</div>').join("");
+  $("relationMatrix").innerHTML=relationMatrix(set,["1","2","3"]);
+  $("closureResult").hidden=true;
+  return set;
+ }catch(e){$("relationResult").innerHTML='<span class="bad">输入错误：</span>'+esc(e.message);$("relationMatrix").innerHTML="";return null;}
+}
+$("relationPreset").addEventListener("change",()=>{
+ const key=$("relationPreset").value;
+ if(key==="custom")return;
+ $("relationInput").value=(presets[key]||[]).map(p=>p.join(",")).join("; ");
+ renderRelation();
+});
+$("checkRelation").addEventListener("click",renderRelation);
+document.querySelectorAll("[data-closure]").forEach(b=>b.addEventListener("click",()=>{
+ const set=renderRelation();if(!set)return;
+ const labels=["1","2","3"],kind=b.dataset.closure;
+ if(kind==="reflexive")for(const x of labels)set.add(pairKey(x,x));
+ if(kind==="symmetric")for(const k of [...set]){const [a,c]=k.split(",");set.add(pairKey(c,a));}
+ if(kind==="transitive"){
+  for(const k of labels)for(const i of labels)for(const j of labels)if(set.has(pairKey(i,k))&&set.has(pairKey(k,j)))set.add(pairKey(i,j));
+ }
+ $("closureResult").hidden=false;
+ $("closureResult").innerHTML='<b>'+(kind==="reflexive"?"自反闭包":kind==="symmetric"?"对称闭包":"传递闭包")+'：</b> '+esc(pairList(set))+'<br><span class="hint">已在原关系上加入最少必要的有序偶；可复制回输入框继续分析。</span><br><button class="btn" id="applyClosure">将闭包载入输入框</button>';
+ $("applyClosure").addEventListener("click",()=>{$("relationInput").value=[...set].map(k=>k.replace(",",",")).join("; ");$("relationPreset").value="custom";renderRelation();});
+}));
+renderRelation();
+
+/* Poset laboratory: input is a list of cover pairs x_i < x_j. */
+const posetLabels=["x1","x2","x3","x4","x5"];
+const defaultCovers=[["x4","x2"],["x4","x3"],["x5","x3"],["x2","x1"],["x3","x1"]];
+function parseCovers(text){
+ const set=new Set();for(const bit of text.split(/[;\n]+/).map(x=>x.trim()).filter(Boolean)){const m=bit.match(/^\s*(x[1-5])\s*,\s*(x[1-5])\s*$/);if(!m)throw new Error("无法识别覆盖关系："+bit);if(m[1]===m[2])throw new Error("覆盖关系不能是自环："+bit);set.add(pairKey(m[1],m[2]));}
+ return set;
+}
+function analyzePoset(){
+ try{
+  const covers=parseCovers($("posetInput").value),rel=new Set();
+  for(const x of posetLabels)rel.add(pairKey(x,x));
+  for(const k of covers)rel.add(k);
+  for(const k of posetLabels)for(const i of posetLabels)for(const j of posetLabels)if(rel.has(pairKey(i,k))&&rel.has(pairKey(k,j)))rel.add(pairKey(i,j));
+  for(const a of posetLabels)for(const b of posetLabels)if(a!==b&&rel.has(pairKey(a,b))&&rel.has(pairKey(b,a)))throw new Error("出现有向环："+a+"≤"+b+" 且 "+b+"≤"+a+"，不满足反对称性。");
+  const less=(a,b)=>a!==b&&rel.has(pairKey(a,b));
+  const minimal=posetLabels.filter(a=>!posetLabels.some(b=>less(b,a)));
+  const maximal=posetLabels.filter(a=>!posetLabels.some(b=>less(a,b)));
+  const least=posetLabels.filter(a=>posetLabels.every(b=>rel.has(pairKey(a,b))));
+  const greatest=posetLabels.filter(a=>posetLabels.every(b=>rel.has(pairKey(b,a))));
+  const actualCovers=[];
+  for(const a of posetLabels)for(const b of posetLabels)if(less(a,b)&&!posetLabels.some(z=>z!==a&&z!==b&&rel.has(pairKey(a,z))&&rel.has(pairKey(z,b))))actualCovers.push(a+"<"+b);
+  const subset=$("subsetPreset").value.split(",");
+  const upper=posetLabels.filter(u=>subset.every(s=>rel.has(pairKey(s,u))));
+  const lower=posetLabels.filter(l=>subset.every(s=>rel.has(pairKey(l,s))));
+  const sup=upper.filter(u=>upper.every(v=>rel.has(pairKey(u,v))));
+  const inf=lower.filter(l=>lower.every(v=>rel.has(pairKey(v,l))));
+  const fmt=x=>x.length?x.join("、"):"不存在";
+  $("posetResult").innerHTML='<b class="good">输入关系通过偏序检查（自反、反对称、传递）。</b><br><b>传递闭包中的有序对：</b>'+esc(pairList(rel))+'<br><b>覆盖关系：</b>'+esc(actualCovers.join("；")||"无")+'<br><b>极小元：</b>'+esc(fmt(minimal))+'；<b>极大元：</b>'+esc(fmt(maximal))+'<br><b>最小元：</b>'+esc(fmt(least))+'；<b>最大元：</b>'+esc(fmt(greatest))+'<hr><b>当前子集：</b>'+esc("{"+subset.join(", ")+"}")+'<br><b>上界：</b>'+esc(fmt(upper))+'；<b>下界：</b>'+esc(fmt(lower))+'<br><b>上确界：</b>'+esc(fmt(sup))+'；<b>下确界：</b>'+esc(fmt(inf));
+ }catch(e){$("posetResult").innerHTML='<span class="bad">无法构成偏序：</span>'+esc(e.message);}
+}
+$("checkPoset").addEventListener("click",analyzePoset);
+$("resetPoset").addEventListener("click",()=>{$("posetInput").value=defaultCovers.map(x=>x.join(",")).join("; ");$("subsetPreset").value="x2,x3,x4";analyzePoset();});
+$("subsetPreset").addEventListener("change",analyzePoset);
+analyzePoset();
+})();
+</script>
+</body></html>
