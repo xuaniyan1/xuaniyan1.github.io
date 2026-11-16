@@ -29,11 +29,11 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <div class="shell">
 <header>
  <a class="brand" href="../"><span class="mark">CA</span><span>Code Atelier<small>PERSONAL PRACTICE SPACE</small></span></a>
- <nav class="nav"><a href="../">总首页</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
+ <nav class="nav"><a href="../">总首页</a><a href="./learning.html">学习地图</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
 </header>
 <section class="hero">
  <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，逐题查看参考解答思路、完整推导与易错点。进度和草稿保存在当前浏览器。</p></div>
- <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="resetFilters">重置筛选</button></div>
+ <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="solutionModeBtn">先做题模式：关</button><button class="btn" id="resetFilters">重置筛选</button></div>
 </section>
 <section class="stats">
  <div class="stat"><strong id="totalStat">—</strong><span>题库题目</span></div>
@@ -96,7 +96,7 @@ const normalizeUnit=u=>{
  if(/图论|欧拉|哈密顿|Huffman|树/.test(u))return "图论";
  return u||"其他";
 };
-let questions=[],selectedId=null,activeUnit="",activeStatus="all",progress={status:{},bookmarks:[],drafts:{}},visible=[];
+let questions=[],selectedId=null,activeUnit="",activeStatus="all",showSolutions=true,progress={status:{},bookmarks:[],drafts:{}},visible=[];
 try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");progress={status:saved.status||{},bookmarks:Array.isArray(saved.bookmarks)?saved.bookmarks:[],drafts:saved.drafts||{}};}catch(e){}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}catch(e){toast("浏览器暂时无法保存记录，请检查存储设置。");}}
 let toastTimer;
@@ -181,7 +181,7 @@ function renderDetail(){
  if(!q){$("detailPanel").innerHTML='<div class="empty">选择左侧题目开始练习。</div>';return;}
  const s=statusOf(q),book=progress.bookmarks.includes(q.id);
  const solution=q.solution_pages?("第 "+q.solution_pages+" 页"):"未标注";
- const solutionHtml=renderSolution(q);
+ const solutionHtml=showSolutions?renderSolution(q):'<section class="solution-missing">先做题模式已开启：请先独立写出定义、证明路线和关键步骤。完成后点击“显示参考解析”进行对照。</section>';
  const figureNote=q.has_figure?(solutionDataHasDiagram(q.id)?'<div class="figure-note">原题包含图形；下方配有根据原始资料重绘的示意图，便于跟随步骤理解。</div>':'<div class="figure-note">原题包含图形或关系图。当前题目尚无可靠重绘图，请以原始资料为准，不根据 OCR 猜测图形。</div>'):"";
  $("detailPanel").innerHTML=
  '<div class="detail-top"><span class="detail-id">'+esc(q.id)+'</span><span class="chip '+(isReview(q)?'amber':'green')+'">'+(isReview(q)?"需要核对":"题干已整理")+'</span></div>'+
@@ -192,9 +192,10 @@ function renderDetail(){
  solutionHtml+
  '<div class="solve-head"><b>我的解题笔记</b><span>自动保存在当前浏览器</span></div>'+
  '<textarea class="draft" id="draftInput" placeholder="记录你自己的思路、卡住的步骤、证明草稿或复习提醒…">'+esc(progress.drafts[q.id]||"")+'</textarea>'+
- '<div class="actions"><button class="btn primary '+(s==="mastered"?"selected":"")+'" id="masterBtn">'+(s==="mastered"?"✓ 已掌握":"标记已掌握")+'</button><button class="btn '+(s==="wrong"?"wrong-selected":"")+'" id="wrongBtn">'+(s==="wrong"?"↺ 已加入错题":"加入错题本")+'</button><button class="btn '+(book?"selected":"")+'" id="bookmarkBtn">'+(book?"★ 已收藏":"☆ 收藏")+'</button><button class="btn" id="clearBtn">清除状态</button></div>'+
+ '<div class="actions"><button class="btn" id="solutionToggleBtn">'+(showSolutions?"隐藏参考解析":"显示参考解析")+'</button><button class="btn primary '+(s==="mastered"?"selected":"")+'" id="masterBtn">'+(s==="mastered"?"✓ 已掌握":"标记已掌握")+'</button><button class="btn '+(s==="wrong"?"wrong-selected":"")+'" id="wrongBtn">'+(s==="wrong"?"↺ 已加入错题":"加入错题本")+'</button><button class="btn '+(book?"selected":"")+'" id="bookmarkBtn">'+(book?"★ 已收藏":"☆ 收藏")+'</button><button class="btn" id="clearBtn">清除状态</button></div>'+
  '<details class="source"><summary>题目来源与校对信息</summary><div class="source-body"><strong>来源文件：</strong>'+esc(q.source_file||"未标注")+'<br><strong>题目页码：</strong>'+esc(q.question_page??"未标注")+'<br><strong>参考解答页码：</strong>'+esc(solution)+'<br><strong>来源类型：</strong>'+esc(q.source_type||"未标注")+'<br><strong>知识点：</strong>'+esc((q.topics||[]).join("、"))+'<br><strong>校对备注：</strong>'+esc(q.review_status||"无")+'</div></details>'+
  '<div class="detail-nav"><button id="prevBtn" '+(visible.findIndex(x=>x.id===q.id)<=0?"disabled":"")+' >← 上一道</button><button id="nextBtn" '+(visible.findIndex(x=>x.id===q.id)>=visible.length-1?"disabled":"")+' >下一道 →</button></div>';
+ $("solutionToggleBtn").addEventListener("click",()=>{showSolutions=!showSolutions;renderDetail();});
  $("draftInput").addEventListener("input",e=>{progress.drafts[q.id]=e.target.value;persist();});
  $("masterBtn").addEventListener("click",()=>{progress.status[q.id]=s==="mastered"?"todo":"mastered";persist();renderStats();renderList();toast(progress.status[q.id]==="mastered"?"已记录为掌握":"已移回待练");});
  $("wrongBtn").addEventListener("click",()=>{progress.status[q.id]=s==="wrong"?"todo":"wrong";persist();renderStats();renderList();toast(progress.status[q.id]==="wrong"?"已加入错题本":"已从错题状态移出");});
@@ -214,7 +215,12 @@ async function init(){
   const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
   const data=JSON.parse(await new Response(stream).text());
   questions=(data.questions||[]).map(q=>{const patch=(window.DM2_QUESTION_PATCHES||{})[q.id]||{};const merged={...q,...patch};return {...merged,normalizedUnit:normalizeUnit(merged.unit||q.unit)};});
-  renderStats();renderUnits();refreshSelects();renderList();
+  renderStats();renderUnits();refreshSelects();
+  const requestedId=new URLSearchParams(location.search).get("q");
+  if(requestedId&&questions.some(q=>q.id===requestedId)){selectedId=requestedId;const m=requestedId.match(/^DM2-(HW\d+|FINAL)-/);if(m)$("assignmentSelect").value=m[1];}
+  renderList();
+  $("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");
+  $("solutionModeBtn").addEventListener("click",()=>{showSolutions=!showSolutions;$("solutionModeBtn").textContent="先做题模式："+(showSolutions?"关":"开");renderDetail();});
   $("searchInput").addEventListener("input",renderList);
   ["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).addEventListener("change",renderList));
   $("statusList").querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.status)));
