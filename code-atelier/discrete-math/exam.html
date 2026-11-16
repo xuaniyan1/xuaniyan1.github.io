@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2f4ef">
+<title>离散数学 2 · 历年真题训练场</title>
+<meta name="description" content="基于课程原始试卷的逐题复习、计时测验、证明题自测、间隔复习与来源校对。">
+<style>
+:root{--bg:#f3f5f1;--paper:#fff;--ink:#223029;--muted:#78887e;--line:#e2e9e2;--forest:#28694b;--forest-soft:#e7f3ec;--amber:#986a2c;--amber-soft:#fcf4e6;--red:#aa554b;--red-soft:#fbeeea;--blue:#547a84;--blue-soft:#ecf3f5}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans SC","Microsoft YaHei",sans-serif;font-size:14px}
+button,textarea,select,input{font:inherit}button{cursor:pointer}a{color:var(--forest);text-decoration:none}a:hover{text-decoration:underline}
+.shell{max-width:1260px;margin:0 auto;padding:0 22px}.top{height:66px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dae4db}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:#244636;letter-spacing:-.3px}.logo{height:31px;width:31px;display:grid;place-items:center;color:white;border-radius:10px;background:#294d3c;font-size:11px}
+.brand small{display:block;font-weight:600;color:#84918a;font-size:9px;letter-spacing:1.3px}.nav{display:flex;gap:17px;font-weight:700;font-size:12px}.hero{padding:33px 0 18px}.eyebrow{color:var(--forest);font-size:10px;letter-spacing:2px;font-weight:850}
+h1{font-size:30px;letter-spacing:-1.4px;line-height:1.3;margin:8px 0}.hero p{font-size:12px;line-height:1.9;color:var(--muted);max-width:850px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 14px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:14px}.stat strong{font-size:24px;line-height:1.15;letter-spacing:-1px;display:block}.stat small{display:block;font-size:10px;color:var(--muted);margin-top:5px}
+.tablist{display:flex;flex-wrap:wrap;gap:6px;background:#e8eee7;border-radius:12px;padding:6px;margin:12px 0 18px}.tab{border:0;background:transparent;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:780;color:#69766d}.tab.active{background:white;color:var(--forest);box-shadow:0 2px 9px #25382810}
+.pane{display:none}.pane.active{display:block}.section-title{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:16px 0 12px}.section-title h2{font-size:18px;margin:0;letter-spacing:-.5px}.section-title p{font-size:11px;line-height:1.8;color:var(--muted);margin:4px 0 0}
+.workspace{display:grid;grid-template-columns:310px minmax(0,1fr);gap:13px;align-items:start}.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0;box-shadow:0 9px 24px #25382808}.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.field{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;background:white;font-size:11px;color:#46584b;outline:none}.field:focus,.draft:focus{outline:2px solid #d8e9dd;border-color:#8dbba1}.list{max-height:66vh;overflow-y:auto;display:grid;gap:6px;margin-top:12px}.q-item{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;text-align:left;padding:11px 10px;display:block;color:var(--ink)}.q-item.active{border-color:#7eb394;background:#edf6ef}.q-item strong{display:block;font-size:11px;line-height:1.6}.q-item small{display:block;margin-top:5px;color:#87948b;font-size:9px}.label{display:inline-block;border-radius:5px;font-weight:750;font-size:9px;padding:4px 7px;background:#f0f3ef;color:#77857a;vertical-align:middle;margin-right:4px}.label.green{background:var(--forest-soft);color:var(--forest)}.label.red{background:var(--red-soft);color:var(--red)}.label.amber{background:var(--amber-soft);color:var(--amber)}.label.blue{background:var(--blue-soft);color:var(--blue)}
+.meta{font-size:10px;color:#8a978d;line-height:1.75;margin:10px 0}.prompt{font-weight:750;font-size:17px;line-height:1.9;margin:16px 0 20px;overflow-wrap:anywhere}.btn{border:1px solid var(--line);background:#fff;color:#4f6456;border-radius:9px;font-size:11px;font-weight:750;padding:9px 13px}.btn:hover{border-color:#8eaf9c}.btn.primary{background:var(--forest);border-color:var(--forest);color:white}.btn.selected{background:var(--forest-soft);border-color:#8dbba1;color:var(--forest)}.btn.wrong{background:var(--red-soft);color:var(--red);border-color:#edc3ba}.btn:disabled{opacity:.5;cursor:default}.controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0}.answer-row{display:flex;gap:10px;flex-wrap:wrap}.answer-row button{flex:1;min-width:125px;padding:14px 12px;font-size:14px}.answer-box{padding:13px 14px;border-radius:11px;background:#f7faf6;border:1px solid #e5eee7;line-height:1.9;font-size:12px;margin-top:13px}.answer-box.correct{border-color:#c9e7d2;background:#f2faf4}.answer-box.wrong{border-color:#eecfc9;background:#fdf5f2}.answer-box strong{color:#355840}.answer-box.wrong strong{color:var(--red)}.soft{color:#819087;font-size:11px;line-height:1.8}.divider{height:1px;background:var(--line);margin:16px 0}.draft{width:100%;min-height:100px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:12px;line-height:1.9;color:#344b3d}
+.empty{padding:30px 14px;text-align:center;color:#9aa59c;font-size:12px;line-height:1.8}.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.config{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.config label{font-size:10px;color:#819087;font-weight:750;display:block;margin-bottom:5px}.smallnote{background:var(--blue-soft);color:#536c73;padding:12px 14px;border-radius:10px;font-size:11px;line-height:1.8;margin-top:12px}
+.test-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.timer{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums}.timer.warn{color:var(--red)}.progressbar{height:6px;background:#e6ece6;border-radius:6px;overflow:hidden;margin:11px 0}.progressbar div{height:100%;background:#3d8c64;transition:width .2s}.exam-choice{display:flex;gap:10px;margin:16px 0}.exam-choice button{min-width:110px}.exam-choice .selected{outline:2px solid #6b9f7e}.exam-choice .selected.false{background:var(--red-soft);color:var(--red);border-color:#e1aea8;outline-color:#d0a19a}.final-list{display:grid;gap:10px;margin:12px 0}.final-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.final-item h3{font-size:12px;line-height:1.8;margin:8px 0}.final-item p{font-size:11px;line-height:1.8;color:#647568;margin:9px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.statline{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:11px}.track{height:7px;border-radius:10px;background:#edf1eb;flex:1;overflow:hidden}.track i{height:100%;background:#7cac8d;display:block;border-radius:10px}.track em{display:block;height:100%;background:#b3c8b7}.proof-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;margin:10px 0}.proof-card h3{font-size:14px;margin:0 0 9px;line-height:1.75}.proof-card .hidden-answer{margin-top:9px;background:#f7faf6;border:1px solid var(--line);border-radius:9px;padding:12px;line-height:1.9;font-size:12px}.proof-card textarea{margin-top:8px}.audit-card{background:#fff;border:1px solid #eadfcf;border-left:3px solid #d5ad65;border-radius:11px;padding:15px;margin-bottom:10px}.audit-card h3{font-size:12px;line-height:1.7;margin:0 0 7px}.audit-card p{font-size:11px;color:#728074;line-height:1.85;margin:5px 0}.footer{display:flex;justify-content:space-between;font-size:10px;color:#9ca69d;padding:25px 0 38px}
+@media(max-width:950px){.workspace{grid-template-columns:1fr}.list{max-height:240px}.grid{grid-template-columns:1fr}}@media(max-width:620px){.shell{padding:0 12px}.nav{gap:9px;font-size:10px}.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:25px}.tab{font-size:10px;padding:9px 8px}.config{grid-template-columns:1fr}.footer{flex-direction:column;gap:6px}.prompt{font-size:15px}}
+</style>
+</head>
+<body><div class="shell">
+<header class="top"><a class="brand" href="../"><span class="logo">CA</span><span>Code Atelier<small>EXAM PRACTICE · DISCRETE MATH II</small></span></a><nav class="nav"><a href="./">作业题库</a><a href="./learning.html">学习地图</a><a href="../">总首页</a></nav></header>
+<section class="hero"><div class="eyebrow">EVIDENCE-BASED EXAM PRACTICE</div><h1>历年真题 · 主动练习场</h1><p>从原始试卷中整理判断题和证明题。支持逐题训练、计时模拟、错题复习与证明草稿。题干经过符号标准化，参考答案依据资料核对；存在争议的题不参与自动判分。</p></section>
+<div class="stats"><div class="stat"><strong id="countTF">—</strong><small>可判分历年判断题</small></div><div class="stat"><strong id="countProof">—</strong><small>原卷证明与计算题</small></div><div class="stat"><strong id="countDone">0</strong><small>已作答不同题目</small></div><div class="stat"><strong id="countDue">0</strong><small>当前到期复习</small></div></div>
+<div class="tablist" role="tablist" aria-label="历年真题训练导航"><button class="tab active" data-tab="practice">逐题训练</button><button class="tab" data-tab="test">计时模拟</button><button class="tab" data-tab="proof">证明与计算</button><button class="tab" data-tab="review">复习与考频</button><button class="tab" data-tab="audit">来源校对</button></div>
+<section class="pane active" id="pane-practice"><div class="workspace">
+ <aside class="panel"><div class="section-title" style="margin:0 0 10px"><div><h2>筛选真题</h2><p>年份、模块与当前复习状态</p></div></div><input class="field" id="query" placeholder="搜索题干、考点……" aria-label="搜索判断题"><div class="filter-grid" style="margin-top:8px"><select class="field" id="year"><option value="">全部年份</option></select><select class="field" id="topic"><option value="">全部模块</option></select><select class="field" id="status"><option value="">所有状态</option><option value="unseen">尚未作答</option><option value="wrong">曾经做错</option><option value="due">到期复习</option><option value="star">已收藏</option></select><button class="btn" id="shuffle" type="button">随机抽题 ↝</button></div><div class="soft" id="listInfo" style="margin-top:12px"></div><div class="list" id="questionList"></div></aside>
+ <main class="panel" id="questionDetail"><div class="empty">从左侧选择一道题开始练习。</div></main>
+</div></section>
+<section class="pane" id="pane-test">
+ <div class="section-title"><div><h2>计时模拟卷</h2><p>从已校验判断题中随机抽题，交卷后才显示答案与逐题解释。无需联网判题。</p></div></div>
+ <div class="panel" id="testConfig"><div class="config"><div><label for="testCount">题目数量</label><select class="field" id="testCount"><option value="10">10 道</option><option value="20">20 道</option><option value="40">全部可用题</option></select></div><div><label for="testYear">来源年份</label><select class="field" id="testYear"><option value="">跨年混合</option></select></div><div><label for="testMinutes">答题时长</label><select class="field" id="testMinutes"><option value="10">10 分钟</option><option value="20">20 分钟</option><option value="40">40 分钟</option></select></div></div><div class="smallnote">交卷后自动统计对错；未作答计为错误。交卷不会自动清除你的草稿和收藏。浏览器刷新后，当前未交卷的测验会结束，已完成的练习进度仍会保留在本机。</div><div class="controls"><button class="btn primary" id="startTest">生成模拟卷</button></div></div>
+ <div id="testWorkspace" style="display:none"></div>
+</section>
+<section class="pane" id="pane-proof">
+ <div class="section-title"><div><h2>历年证明与计算题</h2><p>先写证明路线再展开思路；这部分不做字符串自动判分，由你自行判断掌握程度。</p></div></div><div class="controls"><select class="field" id="proofYear" style="max-width:190px"><option value="">所有年份</option></select><select class="field" id="proofTopic" style="max-width:190px"><option value="">所有模块</option></select></div><div id="proofList"></div>
+</section>
+<section class="pane" id="pane-review">
+ <div class="section-title"><div><h2>复习队列与跨年高频考点</h2><p>间隔复习由本机答题记录决定；考频仅统计当前录入的历年判断题，不等同精确出题概率。</p></div></div><div class="grid"><div class="panel"><h3>到期复习</h3><p class="soft">答错立即加入复习；答对后按 1 / 3 / 7 / 14 / 30 天递进安排。</p><div id="dueList"></div></div><div class="panel"><h3>跨年反复出现的考点</h3><div id="frequency"></div></div></div><div class="panel" style="margin-top:12px"><h3>个人练习统计</h3><div id="reviewStats"></div><div class="controls"><button class="btn" id="downloadProgress">导出当前浏览器学习记录（JSON）</button></div><p class="soft">数据仅保存于当前浏览器 localStorage；换设备或清理站点数据后可能丢失。可导出备份，但目前尚不支持在线同步。</p></div>
+</section>
+<section class="pane" id="pane-audit">
+ <div class="section-title"><div><h2>争议题与来源说明</h2><p>不将来源文件中的不确定前提、参考答案争议或扫描缺失悄悄转写成确定结论。</p></div></div><div class="panel" id="sourcePolicy"></div><div id="auditList" style="margin-top:12px"></div>
+</section>
+<footer class="footer"><span>CODE ATELIER · DISCRETE MATHEMATICS II</span><span>原卷可追溯 · 不确定题不计分 · 错题定期复习</span></footer>
+</div>
+<script src="./exam-data.js"></script>
+<script>
+(function(){
+"use strict";
+const D=window.DM2_EXAM_DATA;
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KEY="dm2-exam-progress-20261116";
+const DAY=86400000,INTERVALS=[0,1,3,7,14,30];
+const topics=[...new Set(D.judgement.map(q=>q.topic))].sort();
+const years=Object.keys(D.years);
+const byId=Object.fromEntries([...D.judgement,...D.proof].map(q=>[q.id,q]));
+let saved={records:{},bookmarks:[],drafts:{},lastResult:null};
+try{const v=JSON.parse(localStorage.getItem(KEY)||"null");if(v&&typeof v==="object")saved={...saved,...v};}catch(e){console.warn("无法读取练习记录",e);}
+saved.records=saved.records||{};saved.bookmarks=Array.isArray(saved.bookmarks)?saved.bookmarks:[];saved.drafts=saved.drafts||{};
+let selected=D.judgement[0]?.id||null;
+let session=null,timerId=null;
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(e){console.warn("无法写入本地记录",e);}}
+function record(id,isCorrect){
+ const old=saved.records[id]||{level:0,attempts:0,correct:0,wrong:0};
+ const level=isCorrect?Math.min(5,(old.level||0)+1):0;
+ saved.records[id]={level,attempts:(old.attempts||0)+1,correct:(old.correct||0)+(isCorrect?1:0),wrong:(old.wrong||0)+(isCorrect?0:1),last:Date.now(),next:Date.now()+INTERVALS[level]*DAY};
+ persist();renderStats();
+}
+function isDue(id){const r=saved.records[id];return r&&r.next<=Date.now();}
+function fillSelect(id,values){const e=$(id);e.innerHTML+=[...values].map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join("");}
+fillSelect("year",years);fillSelect("testYear",years);fillSelect("proofYear",years);
+fillSelect("topic",topics);fillSelect("proofTopic",[...new Set(D.proof.map(q=>q.topic))].sort());
+function renderStats(){
+ $("countTF").textContent=D.judgement.length;
+ $("countProof").textContent=D.proof.length;
+ $("countDone").textContent=Object.keys(saved.records).filter(x=>byId[x]&&(saved.records[x].attempts||0)>0).length;
+ $("countDue").textContent=Object.keys(saved.records).filter(id=>byId[id]&&isDue(id)).length;
+}
+function showTab(tab){
+ document.querySelectorAll("[data-tab]").forEach(e=>e.classList.toggle("active",e.dataset.tab===tab));
+ document.querySelectorAll(".pane").forEach(e=>e.classList.toggle("active",e.id==="pane-"+tab));
+ if(tab==="review")renderReview();
+ if(tab==="proof")renderProof();
+ if(tab==="practice")renderPractice();
+}
+document.querySelectorAll("[data-tab]").forEach(e=>e.addEventListener("click",()=>showTab(e.dataset.tab)));
+function filterQs(){
+ const y=$("year").value,t=$("topic").value,s=$("status").value,f=$("query").value.trim().toLowerCase();
+ return D.judgement.filter(q=>{
+  const r=saved.records[q.id];
+  if(y&&q.year!==y)return false;
+  if(t&&q.topic!==t)return false;
+  if(s==="unseen"&&r)return false;
+  if(s==="wrong"&&(!r||!r.wrong))return false;
+  if(s==="due"&&!isDue(q.id))return false;
+  if(s==="star"&&!saved.bookmarks.includes(q.id))return false;
+  if(f&&![q.prompt,q.topic,q.year,q.explanation].join(" ").toLowerCase().includes(f))return false;
+  return true;
+ });
+}
+function renderPractice(){
+ const qs=filterQs();
+ $("listInfo").textContent="符合条件："+qs.length+" 道。原卷包含相似或重复考点，保留跨年题目供比较。";
+ if(!qs.some(q=>q.id===selected))selected=qs[0]?.id||null;
+ $("questionList").innerHTML=qs.map(q=>{
+  const r=saved.records[q.id],flag=r?(r.wrong?"曾错 "+r.wrong+" 次":"已练习"):"未做";
+  return '<button class="q-item '+(selected===q.id?"active":"")+'" data-q="'+esc(q.id)+'"><strong>'+esc(q.prompt)+'</strong><small>'+esc(q.year)+' · 第 '+q.number+' 判断 · '+esc(q.topic)+' · '+flag+'</small></button>';
+ }).join("")||'<div class="empty">没有匹配的题目。可以清除部分筛选条件。</div>';
+ $("questionList").querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.q;renderPractice();}));
+ renderDetail();
+}
+function relatedQuestions(q){
+ const rel=D.judgement.filter(other=>other.id!==q.id&&other.cluster===q.cluster).slice(0,6);
+ return rel.length?'<div class="divider"></div><b style="font-size:11px">同一考点的跨年题</b><div class="controls">'+rel.map(other=>'<button class="btn" data-jump="'+esc(other.id)+'">'+esc(other.year)+" · 判断 "+other.number+'</button>').join("")+'</div>':"";
+}
+function renderDetail(){
+ const q=byId[selected];
+ if(!q||q.kind!=="tf"){$("questionDetail").innerHTML='<div class="empty">当前筛选下没有可练习的判断题。</div>';return;}
+ const r=saved.records[q.id],shown=!!($("questionDetail").dataset.revealed===q.id);
+ const savedAnswer=$("questionDetail").dataset.answer===q.id?$("questionDetail").dataset.answerValue:null;
+ $("questionDetail").innerHTML='<div class="tagrow"><span class="label green">历年原题 · 判断</span><span class="label">'+esc(q.year)+' 年</span><span class="label blue">'+esc(q.topic)+'</span></div>'+
+  '<div class="meta"><b>来源：</b>'+esc(q.source)+' · PDF 第 '+q.page+' 页 · 原卷第 '+q.number+' 判断题</div>'+
+  '<div class="prompt">'+esc(q.prompt)+'</div>'+
+  '<div class="answer-row"><button class="btn" id="answerTrue">正确 ✓</button><button class="btn" id="answerFalse">错误 ✕</button></div>'+
+  '<div id="instantResult">'+(shown?resultHtml(q,savedAnswer):'<p class="soft">先作答，系统才显示原题答案与解释。你也可以直接记录思路，再判断。</p>')+'</div>'+
+  '<div class="controls"><button class="btn" id="starBtn">'+(saved.bookmarks.includes(q.id)?"★ 已收藏":"☆ 收藏")+'</button><button class="btn" id="revisitBtn">标记需要复习</button><a class="btn" href="./?q='+encodeURIComponent(q.related||"DM2-HW03-Q01")+'">关联作业 ↗</a></div>'+
+  relatedQuestions(q)+
+  '<div class="divider"></div><label class="soft" for="draft">我的理解 / 为什么会错</label><textarea class="draft" id="draft" placeholder="写下推理，别只记住“对/错”……">'+esc(saved.drafts[q.id]||"")+'</textarea>'+
+  '<p class="soft" style="margin-top:8px">原题保留了跨年的重复考点；解析是本站根据数学定义补写的，不冒充原卷标准答案。</p>';
+ $("answerTrue").addEventListener("click",()=>answer(q,true));
+ $("answerFalse").addEventListener("click",()=>answer(q,false));
+ $("starBtn").addEventListener("click",()=>{saved.bookmarks=saved.bookmarks.includes(q.id)?saved.bookmarks.filter(x=>x!==q.id):[...saved.bookmarks,q.id];persist();renderDetail();});
+ $("revisitBtn").addEventListener("click",()=>{record(q.id,false);$("questionDetail").dataset.revealed=q.id;$("questionDetail").dataset.answer=q.id;$("questionDetail").dataset.answerValue="review";renderPractice();});
+ $("draft").addEventListener("input",e=>{saved.drafts[q.id]=e.target.value;persist();});
+ $("questionDetail").querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>{
+  $("year").value="";$("topic").value="";$("status").value="";$("query").value="";
+  selected=b.dataset.jump;$("questionDetail").dataset.revealed="";renderPractice();
+ }));
+}
+function resultHtml(q,attempt){
+ if(attempt==="review")return '<div class="answer-box wrong"><strong>已加入到期复习</strong> · 继续分析后再练一次。</div>';
+ if(attempt===null)return "";
+ const right=String(attempt)===String(q.answer);
+ return '<div class="answer-box '+(right?"correct":"wrong")+'"><strong>'+(right?"回答正确":"回答错误")+'</strong> · 本题答案：<b>'+(q.answer?"正确":"错误")+'</b><br>'+esc(q.explanation)+'<br><span class="soft">'+(right?"答对后延长复习间隔。":"已加入到期复习队列。")+'</span></div>';
+}
+function answer(q,a){
+ record(q.id,a===q.answer);
+ $("questionDetail").dataset.revealed=q.id;
+ $("questionDetail").dataset.answer=q.id;
+ $("questionDetail").dataset.answerValue=String(a);
+ $("instantResult").innerHTML=resultHtml(q,String(a));
+ renderListWithoutDetails();
+}
+function renderListWithoutDetails(){
+ const qs=filterQs();
+ if(!qs.some(q=>q.id===selected)){renderPractice();return;}
+ $("listInfo").textContent="符合条件："+qs.length+" 道";
+ $("questionList").innerHTML=qs.map(q=>{
+ const r=saved.records[q.id];
+ return '<button class="q-item '+(q.id===selected?"active":"")+'" data-q="'+esc(q.id)+'"><strong>'+esc(q.prompt)+'</strong><small>'+esc(q.year)+' · '+esc(q.topic)+' · '+(r?"已练 "+r.attempts+" 次":"未做")+'</small></button>';
+ }).join("");
+ $("questionList").querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.q;$("questionDetail").dataset.revealed="";renderPractice();}));
+}
+["query","year","topic","status"].forEach(id=>$(id).addEventListener(id==="query"?"input":"change",()=>{$("questionDetail").dataset.revealed="";renderPractice();}));
+$("shuffle").addEventListener("click",()=>{const qs=filterQs();if(!qs.length)return;selected=qs[Math.floor(Math.random()*qs.length)].id;$("questionDetail").dataset.revealed="";renderPractice();});
+/* Timed quizzes: state is ephemeral; finished answers update the durable review record. */
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startTest(){
+ if(timerId)clearInterval(timerId);
+ const pool=D.judgement.filter(q=>!$("testYear").value||q.year===$("testYear").value);
+ if(!pool.length)return;
+ const count=Math.min(Number($("testCount").value),pool.length),limit=Math.max(1,Number($("testMinutes").value))*60000;
+ session={items:shuffle(pool).slice(0,count),answers:{},pos:0,started:Date.now(),limit,submitted:false};
+ $("testConfig").style.display="none";$("testWorkspace").style.display="";
+ renderTest();
+ timerId=setInterval(()=>{if(!session||session.submitted)return;const left=session.started+session.limit-Date.now();if(left<=0){submitTest();return;}const timer=$("testTimer");if(timer){timer.textContent=fmtTime(left);timer.classList.toggle("warn",left<120000);}},1000);
+}
+function fmtTime(ms){const s=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+function renderTest(){
+ if(!session||session.submitted)return;
+ const q=session.items[session.pos],a=session.answers[q.id],answered=Object.keys(session.answers).length;
+ const remaining=session.started+session.limit-Date.now();
+ $("testWorkspace").innerHTML='<div class="panel"><div class="test-head"><div><b>模拟卷 · '+session.items.length+' 道</b><p class="soft">已答 '+answered+' / '+session.items.length+'；当前 '+(session.pos+1)+' / '+session.items.length+'</p></div><div class="timer '+(remaining<120000?"warn":"")+'" id="testTimer">'+fmtTime(remaining)+'</div></div>'+
+ '<div class="progressbar"><div style="width:'+100*answered/session.items.length+'%"></div></div><div class="tagrow"><span class="label green">'+esc(q.year)+' 原题</span><span class="label">'+esc(q.topic)+'</span></div><div class="prompt">'+esc(q.prompt)+'</div>'+
+ '<div class="exam-choice"><button class="btn '+(a===true?"selected":"")+'" data-choice="true">正确</button><button class="btn '+(a===false?"selected false":"")+'" data-choice="false">错误</button></div>'+
+ '<div class="controls"><button class="btn" id="testPrev" '+(session.pos===0?"disabled":"")+'>← 上一题</button><button class="btn" id="testNext" '+(session.pos===session.items.length-1?"disabled":"")+'>下一题 →</button><button class="btn primary" id="testSubmit">交卷并查看解释</button></div><p class="soft">答题过程中不展示参考答案；交卷后显示逐题理由，并更新复习队列。</p></div>';
+ $("testWorkspace").querySelectorAll("[data-choice]").forEach(b=>b.addEventListener("click",()=>{session.answers[q.id]=b.dataset.choice==="true";renderTest();}));
+ $("testPrev").addEventListener("click",()=>{session.pos--;renderTest();});
+ $("testNext").addEventListener("click",()=>{session.pos++;renderTest();});
+ $("testSubmit").addEventListener("click",submitTest);
+}
+function submitTest(){
+ if(!session||session.submitted)return;
+ clearInterval(timerId);timerId=null;session.submitted=true;
+ const correct=session.items.filter(q=>session.answers[q.id]===q.answer).length;
+ for(const q of session.items)record(q.id,session.answers[q.id]===q.answer);
+ const result={at:new Date().toISOString(),correct,total:session.items.length,year:$("testYear").value||"跨年混合"};
+ saved.lastResult=result;persist();
+ let content='<div class="panel"><h2>本次测验完成</h2><div class="test-head"><div><p class="soft">正确率 · 错题已加入复习队列</p><div style="font-size:32px;font-weight:800">'+Math.round(100*correct/session.items.length)+'%</div></div><div><b>'+correct+' / '+session.items.length+'</b><p class="soft">正确题数</p></div></div><div class="controls"><button class="btn primary" id="retryTest">再生成一套</button><button class="btn" id="reviewWrong">打开复习队列</button></div></div><div class="final-list">';
+ content+=session.items.map((q,i)=>{const ans=session.answers[q.id],ok=ans===q.answer;return '<div class="final-item"><span class="label '+(ok?"green":"red")+'">'+(ok?"正确":"错误 / 未答")+'</span><span class="label">'+esc(q.year)+' · 第'+q.number+'题</span><h3>'+(i+1)+'. '+esc(q.prompt)+'</h3><p>你的答案：'+(ans===undefined?"未作答":ans?"正确":"错误")+'　参考答案：<b>'+(q.answer?"正确":"错误")+'</b></p><p>'+esc(q.explanation)+'</p><div class="controls">'+(q.related?'<a href="./?q='+encodeURIComponent(q.related)+'" class="btn">对应作业题 ↗</a>':'')+'</div></div>';}).join("");
+ $("testWorkspace").innerHTML=content+'</div>';
+ $("retryTest").addEventListener("click",()=>{$("testConfig").style.display="";$("testWorkspace").style.display="none";session=null;});
+ $("reviewWrong").addEventListener("click",()=>showTab("review"));
+}
+$("startTest").addEventListener("click",startTest);
+/* Proof questions: human self-evaluation, no automatic proof string grading. */
+function renderProof(){
+ const year=$("proofYear").value,topic=$("proofTopic").value;
+ const qs=D.proof.filter(q=>(!year||q.year===year)&&(!topic||q.topic===topic));
+ $("proofList").innerHTML=qs.map(q=>{
+ const r=saved.records[q.id];
+ return '<article class="proof-card" data-proof="'+esc(q.id)+'"><div class="tagrow"><span class="label green">原卷证明 / 计算</span><span class="label">'+esc(q.year)+'</span><span class="label">'+esc(q.topic)+'</span>'+(r?'<span class="label blue">已练 '+r.attempts+' 次</span>':'')+'</div><h3>'+esc(q.prompt)+'</h3><p class="soft">来源：'+esc(q.source)+' · PDF 第 '+q.page+' 页 · '+esc(q.number)+'</p><textarea class="draft" data-draft="'+esc(q.id)+'" placeholder="先写关键定义、证明目标、构造或推导……">'+esc(saved.drafts[q.id]||"")+'</textarea><div class="controls"><button class="btn" data-reveal="'+esc(q.id)+'">展开参考思路</button><button class="btn" data-success="'+esc(q.id)+'">这题我能独立完成</button><button class="btn" data-fail="'+esc(q.id)+'">还不会 / 需要复习</button></div><div class="hidden-answer" id="proofAnswer-'+esc(q.id)+'" hidden><b>参考解题骨架（并非标准评分细则）</b><br>'+esc(q.outline)+'</div></article>';
+ }).join("")||'<div class="empty">没有匹配的证明题。</div>';
+ $("proofList").querySelectorAll("[data-draft]").forEach(e=>e.addEventListener("input",()=>{saved.drafts[e.dataset.draft]=e.value;persist();}));
+ $("proofList").querySelectorAll("[data-reveal]").forEach(b=>b.addEventListener("click",()=>{const el=$("proofAnswer-"+b.dataset.reveal);el.hidden=!el.hidden;b.textContent=el.hidden?"展开参考思路":"收起参考思路";}));
+ $("proofList").querySelectorAll("[data-success]").forEach(b=>b.addEventListener("click",()=>{record(b.dataset.success,true);renderProof();}));
+ $("proofList").querySelectorAll("[data-fail]").forEach(b=>b.addEventListener("click",()=>{record(b.dataset.fail,false);renderProof();}));
+}
+["proofYear","proofTopic"].forEach(id=>$(id).addEventListener("change",renderProof));
+function renderReview(){
+ renderStats();
+ const due=[...D.judgement,...D.proof].filter(q=>isDue(q.id));
+ $("dueList").innerHTML=due.length?due.map(q=>'<div class="statline"><span class="label red">'+esc(q.year)+'</span><span style="flex:1;line-height:1.6">'+esc(q.prompt.length>52?q.prompt.slice(0,52)+"…":q.prompt)+'</span><button class="btn" data-review="'+esc(q.id)+'">复习</button></div>').join(""):'<div class="empty">目前没有到期题目。做错一道题后，它就会进入这里。</div>';
+ $("dueList").querySelectorAll("[data-review]").forEach(b=>b.addEventListener("click",()=>{const q=byId[b.dataset.review];if(q.kind==="proof"){showTab("proof");return;}$("year").value="";$("topic").value="";$("status").value="";$("query").value="";selected=q.id;$("questionDetail").dataset.revealed="";showTab("practice");}));
+ const groups=Object.entries(D.judgement.reduce((o,q)=>{if(!o[q.cluster])o[q.cluster]={topic:q.topic,prompts:[],years:new Set(),count:0};o[q.cluster].count++;o[q.cluster].years.add(q.year);o[q.cluster].prompts.push(q.prompt);return o;},{})).sort((a,b)=>b[1].years.size-a[1].years.size||b[1].count-a[1].count).slice(0,12);
+ const max=Math.max(1,...groups.map(([k,v])=>v.years.size));
+ $("frequency").innerHTML=groups.map(([k,v])=>'<div class="statline"><span style="width:180px;max-width:45%;line-height:1.5">'+esc(k.replace(/-/g," · "))+'</span><div class="track"><i style="width:'+(v.years.size/max*100)+'%"></i></div><span style="min-width:45px;text-align:right">'+v.years.size+' 学年</span></div>').join("")+'<p class="soft">这里只统计已录入的历年判断题，不包括整张卷子的所有大题。</p>';
+ const attempts=Object.values(saved.records).reduce((s,r)=>s+(r.attempts||0),0),wrong=Object.values(saved.records).reduce((s,r)=>s+(r.wrong||0),0),correct=Object.values(saved.records).reduce((s,r)=>s+(r.correct||0),0);
+ $("reviewStats").innerHTML='<div class="controls"><span class="label">总作答 '+attempts+' 次</span><span class="label green">答对 '+correct+' 次</span><span class="label red">答错 '+wrong+' 次</span><span class="label">收藏 '+saved.bookmarks.length+' 道</span></div>'+(saved.lastResult?'<p class="soft">最近一次模拟卷：'+saved.lastResult.correct+'/'+saved.lastResult.total+' · '+esc(saved.lastResult.at.slice(0,10))+'</p>':"");
+}
+$("downloadProgress").addEventListener("click",()=>{
+ const json=JSON.stringify({exportedAt:new Date().toISOString(),source:"Code Atelier Discrete Math II",progress:saved},null,2);
+ const blob=new Blob([json],{type:"application/json;charset=utf-8"}),url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download="discrete_math_exam_progress.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+});
+$("sourcePolicy").innerHTML='<div class="tagrow"><span class="label green">题目来源可追溯</span><span class="label amber">争议不自动判分</span><span class="label blue">补写解析独立标明</span></div><p class="soft">'+esc(D.description)+'</p><div class="divider"></div>'+years.map(y=>'<p class="soft"><b>'+esc(y)+'</b> · '+esc(D.years[y].source)+'<br>来源详情：'+esc(D.years[y].detail)+'<br>解答依据：'+esc(D.years[y].answerSource)+'</p>').join("");
+$("auditList").innerHTML=D.warnings.map((w,i)=>'<article class="audit-card"><span class="label amber">待复核 '+(i+1)+'</span><h3>'+esc(w.source)+'</h3><p><b>问题：</b>'+esc(w.issue)+'</p><p><b>处理：</b>'+esc(w.why)+'</p></article>').join("");
+renderStats();renderPractice();renderProof();
+})();
+</script></body></html>
