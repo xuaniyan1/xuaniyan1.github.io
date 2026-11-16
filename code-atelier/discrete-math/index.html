@@ -46,6 +46,18 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 .problem-figure svg{display:block;width:100%;height:auto;max-height:350px}
 .problem-figure-label{font-size:11px;color:#516e59;font-weight:800;margin-bottom:9px}
 .study-instructions{font-size:11px;line-height:1.8;color:#6e8172;margin:10px 0 14px}
+
+.cloud-panel{margin:12px 0 17px;border:1px solid #dce7df;border-radius:12px;padding:10px 14px;background:#f6fbf7}
+.cloud-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#53705b;font-size:11px;line-height:1.7}
+.cloud-row b{color:#28573d;font-size:12px}
+.cloud-row a{color:#2c6948;font-weight:700}
+.cloud-row button{border:1px solid #bdd5c5;border-radius:8px;background:#fff;padding:7px 10px;font-size:11px;color:#285b41;font-weight:700;cursor:pointer}
+.cloud-row button:hover{background:#e5f2e9}
+.cloud-auth-form{display:flex;flex-wrap:wrap;gap:6px}
+.cloud-auth-form input{min-width:180px;border-radius:8px;padding:7px 10px;border:1px solid #c8d9ce;font-size:11px}
+.cloud-message{color:#7b8d80}
+@media(max-width:600px){.cloud-row{align-items:stretch}.cloud-auth-form{width:100%}.cloud-auth-form input{flex:1}}
+
 </style>
 </head>
 <body>
@@ -58,6 +70,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
  <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，按老师课件的“知识点 → 定义 → 证明路线 → 完整解析”逐题精讲。进度和草稿保存在当前浏览器。</p></div>
  <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="solutionModeBtn">先做题模式：开</button><button class="btn" id="resetFilters">重置筛选</button><a class="btn" href="https://github.com/xuaniyan1/xuaniyan1.github.io/blob/main/code-atelier/discrete-math/AUDIT_2025.md" target="_blank" rel="noopener noreferrer">查看原题审校记录 ↗</a></div>
 </section>
+<div id="cloudAccount" class="cloud-panel" aria-live="polite"></div>
 <section class="stats">
  <div class="stat"><strong id="totalStat">—</strong><span>题库题目</span></div>
  <div class="stat"><strong id="masteredStat">0</strong><span>已掌握</span></div>
@@ -128,6 +141,8 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 <script src="./ppt-guides.js"></script>
 <script src="./graph2022-data.js"></script>
 <script src="./exam-data.js"></script>
+<script src="./cloud-config.js"></script>
+<script src="./cloud-sync.js"></script>
 <script>
 (()=>{
 "use strict";
@@ -146,7 +161,13 @@ const normalizeUnit=u=>{
 };
 let questions=[],selectedId=null,activeUnit="",activeStatus="all",showSolutions=false,progress={status:{},bookmarks:[],drafts:{}},visible=[];
 try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");progress={status:saved.status||{},bookmarks:Array.isArray(saved.bookmarks)?saved.bookmarks:[],drafts:saved.drafts||{}};}catch(e){}
-function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}catch(e){toast("浏览器暂时无法保存记录，请检查存储设置。");}}
+function persist(){
+  try{
+   const key=window.DM2Cloud?window.DM2Cloud.storageKey(STORAGE_KEY):STORAGE_KEY;
+   localStorage.setItem(key,JSON.stringify(progress));
+   window.DM2Cloud?.changed("homework");
+  }catch(e){toast("浏览器暂时无法保存记录，请检查存储设置。");}
+ }
 let toastTimer;
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),1800);}
 function isReview(q){return /待校对|待人工|需对照|OCR 不完整|OCR缺失|需核对|暂未/.test(q.review_status||"");}
@@ -313,6 +334,27 @@ async function init(){
   $("statusList").querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.status)));
   $("resetFilters").addEventListener("click",resetFilters);
   $("randomBtn").addEventListener("click",()=>{if(!visible.length){toast("当前筛选下没有题目");return;}selectedId=visible[Math.floor(Math.random()*visible.length)].id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";renderList();});
+ 
+  if(window.DM2Cloud) window.DM2Cloud.register({
+    section:"homework",legacyKey:STORAGE_KEY,
+    empty:()=>({status:{},bookmarks:[],drafts:{}}),
+    snapshot:()=>JSON.parse(JSON.stringify(progress)),
+    apply:(next)=>{
+      const v=next&&typeof next==="object"?next:{};
+      progress={
+        status:v.status&&typeof v.status==="object"?v.status:{},
+        bookmarks:Array.isArray(v.bookmarks)?v.bookmarks:[],
+        drafts:v.drafts&&typeof v.drafts==="object"?v.drafts:{}
+      };
+      renderStats();renderList();
+    },
+    merge:(current,guest)=>({
+      status:{...(current.status||{}),...(guest.status||{})},
+      bookmarks:[...new Set([...(current.bookmarks||[]),...(guest.bookmarks||[])])],
+      drafts:{...(current.drafts||{}),...(guest.drafts||{})}
+    })
+  });
+
  }catch(e){$("questionList").innerHTML='<div class="empty">题库加载失败：'+esc(e.message)+'</div>';console.error(e);}
 }
 init();
