@@ -103,7 +103,7 @@ let toastTimer;
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),1800);}
 function isReview(q){return /待校对|待人工|需对照|OCR 不完整|OCR缺失|需核对|暂未/.test(q.review_status||"");}
 function statusOf(q){return progress.status[q.id]||"todo";}
-function assignmentLabel(q){const m=q.id.match(/^DM2-HW(\\d+)-/);return m?"第"+Number(m[1])+"次作业"+(q.year==="2024秋"?" · 2024秋":""):q.id.includes("FINAL")?"期末回忆版":"";}
+function assignmentLabel(q){const m=q.id.match(/^DM2-HW(\d+)-/);return m?"第"+Number(m[1])+"次作业"+(q.year==="2024秋"?" · 2024秋":""):q.id.includes("FINAL")?"期末回忆版":"";}
 function renderStats(){
  $("totalStat").textContent=questions.length;
  $("masteredStat").textContent=Object.values(progress.status).filter(x=>x==="mastered").length;
