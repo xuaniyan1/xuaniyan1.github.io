@@ -148,7 +148,7 @@ function renderMethods(filter=""){
  $("methodGrid").innerHTML=rows.map(m=>'<article class="card method-card"><div class="meta">'+esc(m.when)+'</div><h3>'+esc(m.title)+'</h3><ol class="list">'+m.recipe.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ol><p><b>原题例子：</b>'+esc(m.example)+'</p><p class="caution"><b>常见陷阱：</b>'+esc(m.trap)+'</p><div class="bottom"><div class="link-row">'+m.questionIds.map(qlink).join("")+'</div></div></article>').join("")||'<div class="card">没有找到匹配的方法卡。</div>';
 }
 function renderExams(){
- $("examBody").innerHTML=D.exams.map(e=>'<tr><td>'+esc(e.year)+'<br><span class="hint">'+esc(e.file)+'</span></td><td>'+esc(e.coverage)+'</td><td><span class="quality">'+esc(e.quality)+'</span></td><td>'+esc(e.note)+'</td></tr>').join("");
+ $("examBody").innerHTML=D.exams.map(e=>{const open=e.year==="2025–2026 回忆版"?'<br><a class="text-link" href="./?q=DM2-FINAL-2025-Q01">打开 9 道回忆题 ↗</a>':"";return '<tr><td>'+esc(e.year)+'<br><span class="hint">'+esc(e.file)+'</span>'+open+'</td><td>'+esc(e.coverage)+'</td><td><span class="quality">'+esc(e.quality)+'</span></td><td>'+esc(e.note)+'</td></tr>';}).join("");
  const priorities=[
   ["极高","二元关系；序关系与等价关系；函数；图论基本概念与连通性","关系闭包、Hasse 图、函数逆、图的连通分支在资料中反复出现。"],
   ["高","集合论；自然数与基数；欧拉/Hamilton；图的矩阵表示；树与最优结构","是课程主干与历年综合题的稳定组成。"],
