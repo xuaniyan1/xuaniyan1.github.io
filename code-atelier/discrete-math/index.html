@@ -42,6 +42,10 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
 .recent-route a{border:1px solid #dfe9e0;background:#fff;color:#37684c;padding:8px 10px;border-radius:8px;font-size:10px;font-weight:800;text-decoration:none}
 .recent-route a:hover{background:#eef5ef;border-color:#a6c9ac}
 .solution-source-note{margin:10px 0 14px;padding:9px 11px;background:#f5f7f3;border-left:3px solid #879d88;border-radius:7px;color:#69786c;font-size:10px;line-height:1.8}
+.problem-figure{margin:12px 0 18px;padding:12px;background:#fff;border:1px solid #dfe9e1;border-radius:12px;overflow-x:auto}
+.problem-figure svg{display:block;width:100%;height:auto;max-height:350px}
+.problem-figure-label{font-size:11px;color:#516e59;font-weight:800;margin-bottom:9px}
+.study-instructions{font-size:11px;line-height:1.8;color:#6e8172;margin:10px 0 14px}
 </style>
 </head>
 <body>
@@ -140,7 +144,7 @@ const normalizeUnit=u=>{
  if(/图论|欧拉|哈密顿|Huffman|树/.test(u))return "图论";
  return u||"其他";
 };
-let questions=[],selectedId=null,activeUnit="",activeStatus="all",showSolutions=true,progress={status:{},bookmarks:[],drafts:{}},visible=[];
+let questions=[],selectedId=null,activeUnit="",activeStatus="all",showSolutions=false,progress={status:{},bookmarks:[],drafts:{}},visible=[];
 try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");progress={status:saved.status||{},bookmarks:Array.isArray(saved.bookmarks)?saved.bookmarks:[],drafts:saved.drafts||{}};}catch(e){}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(progress));}catch(e){toast("浏览器暂时无法保存记录，请检查存储设置。");}}
 let toastTimer;
@@ -199,12 +203,12 @@ function renderList(){
  visible=questions.filter(matches);
  $("resultCount").textContent="找到 "+visible.length+" 道题";
  if(!visible.length){$("questionList").innerHTML='<div class="empty">没有符合条件的题目。试试清除部分筛选条件。</div>';renderDetail();return;}
- if(!visible.some(q=>q.id===selectedId))selectedId=visible[0].id;
+ if(!visible.some(q=>q.id===selectedId)){selectedId=visible[0].id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";}
  $("questionList").innerHTML=visible.map(q=>{
   const s=statusOf(q),review=isReview(q),book=progress.bookmarks.includes(q.id);
   return '<article class="q-card '+(q.id===selectedId?'active':'')+'" data-id="'+esc(q.id)+'"><div class="q-title">'+esc(q.title)+'</div><div class="q-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip green">分步解析</span>'+(s==="mastered"?'<span class="chip green">已掌握</span>':s==="wrong"?'<span class="chip red">待复习</span>':'')+(review?'<span class="chip amber">待核对</span>':'')+(book?'<span class="chip">★ 收藏</span>':'')+'</div></article>';
  }).join("");
- $("questionList").querySelectorAll("[data-id]").forEach(el=>el.addEventListener("click",()=>{selectedId=el.dataset.id;renderList();}));
+ $("questionList").querySelectorAll("[data-id]").forEach(el=>el.addEventListener("click",()=>{selectedId=el.dataset.id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";renderList();}));
  renderDetail();
 }
 function richText(value){return esc(value??"").replace(/\n/g,"<br>");}
@@ -228,6 +232,12 @@ function renderPptGuide(q){
   (recent.length?'<div class="ppt-related"><b>2025—2026 期末回忆题的对应考点：</b><br>'+recent.join('　')+'</div>':'')+
   '</section>';
 }
+const PROMPT_FIGURES=new Set(["DM2-HW03-Q01","DM2-HW04-Q01","DM2-FINAL-2025-Q07"]);
+function renderProblemFigure(q){
+ if(!PROMPT_FIGURES.has(q.id))return "";
+ const diagram=(window.DM2_SOLUTIONS||{})[q.id]?.diagram;
+ return diagram?'<div class="problem-figure"><div class="problem-figure-label">原题图示 / 已按资料重绘（做题前可见）</div>'+diagram+'</div>':"";
+}
 function renderSolution(q){
  const solutionData=(window.DM2_SOLUTIONS||{})[q.id];
  if(!solutionData)return '<section class="solution-missing">这道题的逐步解析正在整理，暂时不展示未经核对的答案。</section>';
@@ -236,7 +246,7 @@ function renderSolution(q){
   const body=Array.isArray(step)?step[1]:step.text;
   return '<article class="solution-step"><div class="solution-step-no">'+String(index+1).padStart(2,"0")+'</div><div><h4>'+richText(heading)+'</h4><p>'+richText(body)+'</p></div></article>';
  }).join("");
- const diagram=solutionData.diagram?'<div class="solution-diagram">'+solutionData.diagram+'</div>':"";
+ const diagram=solutionData.diagram&&!PROMPT_FIGURES.has(q.id)?'<div class="solution-diagram">'+solutionData.diagram+'</div>':"";
  const answer=solutionData.answer?'<div class="solution-answer"><b>本题结论</b><p>'+richText(solutionData.answer)+'</p></div>':"";
  const pitfalls=solutionData.pitfalls?'<div class="solution-pitfalls"><b>易错提醒</b><p>'+richText(solutionData.pitfalls)+'</p></div>':"";
  const sourceNote=solutionData.sourceNote?'<div class="solution-source-note">'+richText(solutionData.sourceNote)+'</div>':"";
@@ -261,6 +271,8 @@ function renderDetail(){
  '<div class="detail-meta"><span class="chip">'+esc(assignmentLabel(q)) +'</span><span class="chip">'+esc(q.normalizedUnit)+'</span><span class="chip">'+esc(q.type)+'</span><span class="chip">'+esc(q.difficulty||"未标定")+'</span><span class="chip">'+esc(q.year||"未标年份")+'</span></div>'+
  '<div class="prompt-label">QUESTION / 题目</div><div class="prompt">'+richText(q.prompt)+'</div>'+
  figureNote+
+ renderProblemFigure(q)+
+ '<p class="study-instructions">建议先自己做：原题图示始终可见。可逐层展开提示；完整答案默认隐藏，做完再点“显示参考解析”。</p>'+
  renderPptGuide(q)+
  solutionHtml+
  relatedExamHtml(q)+
@@ -278,7 +290,7 @@ function renderDetail(){
  $("prevBtn").addEventListener("click",()=>move(-1));$("nextBtn").addEventListener("click",()=>move(1));
 }
 function solutionDataHasDiagram(id){return !!((window.DM2_SOLUTIONS||{})[id]||{}).diagram;}
-function move(delta){const i=visible.findIndex(q=>q.id===selectedId),n=i+delta;if(n>=0&&n<visible.length){selectedId=visible[n].id;renderList();}}
+function move(delta){const i=visible.findIndex(q=>q.id===selectedId),n=i+delta;if(n>=0&&n<visible.length){selectedId=visible[n].id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";renderList();}}
 function setStatus(s){activeStatus=s;$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status===s));renderList();}
 function resetFilters(){activeUnit="";activeStatus="all";$("searchInput").value="";$("assignmentSelect").value="2025";["typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).value="");$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="all"));renderUnits();renderList();}
 async function init(){
