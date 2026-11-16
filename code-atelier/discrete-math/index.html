@@ -32,7 +32,7 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
  <nav class="nav"><a href="../">总首页</a><a href="../data-structures.html">数据结构与算法</a><a href="../buaa-exams/">北航复试真题</a></nav>
 </header>
 <section class="hero">
- <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>按知识模块刷题，把证明、计算与构造过程记录下来。所有进度和草稿保存在当前浏览器。</p></div>
+ <div><div class="eyebrow">DISCRETE MATHEMATICS · COURSE 02</div><h1>离散数学 2</h1><p>以 2025 秋季作业 40 题为主线，按章节刷题，逐题查看参考解答思路、完整推导与易错点。进度和草稿保存在当前浏览器。</p></div>
  <div class="hero-actions"><button class="btn" id="randomBtn">随机抽题 ↗</button><button class="btn" id="resetFilters">重置筛选</button></div>
 </section>
 <section class="stats">
@@ -55,12 +55,13 @@ footer{padding:22px 0 28px;color:#9aa39b;font-size:10px;display:flex;justify-con
    <button class="unit-btn" data-status="bookmarked">我的收藏 <em>收藏</em></button>
   </div>
   <div class="side-divider"></div>
-  <div class="side-note">当前题库共 57 道题，覆盖 8 次课程作业与 2025—2026 期末回忆版。每题均配有考点分析、分步推导、结论和易错提醒；关系图、哈斯图、图论与 Huffman 题配有重绘示意。个别手写图或 OCR 细节仍建议对照原始资料。</div>
+  <div class="side-note">题库共 57 题，其中重点专题为 2025 秋季作业 40 题（第 1—6、8 次），逐题对照原始参考答案扩充思路、推导、结论与易错点。第 7 次作业原 PDF 标注为 2024 秋，单独保留；另有 9 道 2025—2026 期末回忆题。</div>
  </aside>
  <section class="panel list-panel">
   <div class="filters">
    <input class="search" id="searchInput" placeholder="搜索题目、知识点或题干…" autocomplete="off">
    <div class="filter-grid">
+    <select id="assignmentSelect"><option value="">全部作业 / 试卷</option></select>
     <select id="typeSelect"><option value="">全部题型</option></select>
     <select id="difficultySelect"><option value="">全部难度</option></select>
     <select id="yearSelect"><option value="">全部来源年份</option></select>
@@ -115,6 +116,15 @@ function renderUnits(){
 }
 function fillSelect(id,values,label){const el=$(id),old=el.value;el.innerHTML='<option value="">'+label+'</option>'+values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");if(values.includes(old))el.value=old;}
 function refreshSelects(){
+ const assignmentOptions=[
+  ["2025秋季作业（40题）","2025"],
+  ["第一次作业（7题）","HW01"],["第二次作业（4题）","HW02"],["第三次作业（6题）","HW03"],["第四次作业（7题）","HW04"],
+  ["第五次作业（8题）","HW05"],["第六次作业（4题）","HW06"],["第七次作业 · 2024秋（8题）","HW07"],["第八次作业（4题）","HW08"],
+  ["2025—2026期末回忆版（9题）","FINAL"]
+ ];
+ const el=$("assignmentSelect"),old=el.value;
+ el.innerHTML='<option value="">全部作业 / 试卷</option>'+assignmentOptions.map(([label,value])=>'<option value="'+value+'">'+label+'</option>').join("");
+ if(assignmentOptions.some(([,value])=>value===old))el.value=old;
  fillSelect("typeSelect",[...new Set(questions.map(q=>q.type).filter(Boolean))].sort(),"全部题型");
  fillSelect("difficultySelect",[...new Set(questions.map(q=>q.difficulty).filter(Boolean))].sort(),"全部难度");
  fillSelect("yearSelect",[...new Set(questions.map(q=>q.year).filter(Boolean))].sort(),"全部来源年份");
@@ -122,6 +132,10 @@ function refreshSelects(){
 }
 function matches(q){
  const search=$("searchInput").value.trim().toLowerCase();
+ const assignment=$("assignmentSelect").value;
+ if(assignment==="2025"&&(!/^DM2-HW/.test(q.id)||q.year!=="2025秋"))return false;
+ if(assignment==="FINAL"&&!q.id.includes("FINAL"))return false;
+ if(assignment&&assignment!=="2025"&&assignment!=="FINAL"&&!q.id.startsWith("DM2-"+assignment+"-"))return false;
  if(activeUnit&&q.normalizedUnit!==activeUnit)return false;
  if($("typeSelect").value&&q.type!==$("typeSelect").value)return false;
  if($("difficultySelect").value&&q.difficulty!==$("difficultySelect").value)return false;
@@ -190,7 +204,7 @@ function renderDetail(){
 function solutionDataHasDiagram(id){return !!((window.DM2_SOLUTIONS||{})[id]||{}).diagram;}
 function move(delta){const i=visible.findIndex(q=>q.id===selectedId),n=i+delta;if(n>=0&&n<visible.length){selectedId=visible[n].id;renderList();}}
 function setStatus(s){activeStatus=s;$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status===s));renderList();}
-function resetFilters(){activeUnit="";activeStatus="all";$("searchInput").value="";["typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).value="");$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="all"));renderUnits();renderList();}
+function resetFilters(){activeUnit="";activeStatus="all";$("searchInput").value="";["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).value="");$("statusList").querySelectorAll("[data-status]").forEach(b=>b.classList.toggle("active",b.dataset.status==="all"));renderUnits();renderList();}
 async function init(){
  try{
   if(!window.DM2_DATA_B64)throw new Error("题库数据文件没有加载。");
@@ -201,7 +215,7 @@ async function init(){
   questions=(data.questions||[]).map(q=>{const patch=(window.DM2_QUESTION_PATCHES||{})[q.id]||{};const merged={...q,...patch};return {...merged,normalizedUnit:normalizeUnit(merged.unit||q.unit)};});
   renderStats();renderUnits();refreshSelects();renderList();
   $("searchInput").addEventListener("input",renderList);
-  ["typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).addEventListener("change",renderList));
+  ["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).addEventListener("change",renderList));
   $("statusList").querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.status)));
   $("resetFilters").addEventListener("click",resetFilters);
   $("randomBtn").addEventListener("click",()=>{if(!visible.length){toast("当前筛选下没有题目");return;}selectedId=visible[Math.floor(Math.random()*visible.length)].id;renderList();});
