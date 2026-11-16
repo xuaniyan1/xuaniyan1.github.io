@@ -309,7 +309,6 @@ function runHuffman(){
     labels.push('<text x="'+node.x.toFixed(1)+'" y="'+(node.y+29).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#718076">w'+(node.index+1)+'</text>');
     return;
    }
-   draw(node);
    drawLeaves(node.left);drawLeaves(node.right);
   }
   drawLeaves(root);
