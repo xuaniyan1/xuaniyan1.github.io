@@ -1,6 +1,16 @@
-# Code Atelier · 北航复试机试真题库
+# Code Atelier · 个人刷题工作台
 
-入口：<https://xuaniyan1.github.io/code-atelier/buaa-exams/>
+入口：<https://xuaniyan1.github.io/code-atelier/>
+
+## 站点结构
+- **总首页**：<https://xuaniyan1.github.io/code-atelier/>
+- **数据结构与算法**：<https://xuaniyan1.github.io/code-atelier/data-structures.html>（原有 408 编程训练模块，保留）
+- **北航复试机试真题**：<https://xuaniyan1.github.io/code-atelier/buaa-exams/>
+- **离散数学 2**：<https://xuaniyan1.github.io/code-atelier/discrete-math/>（新增 57 道首批整理题，支持知识模块筛选、解题草稿、错题与收藏）
+
+两个学习模块保持独立答题方式：编程题使用在线编译评测；离散数学题以证明、计算、判断和构造为主，使用解题草稿与自我标记。离散数学题目进度暂存在当前浏览器；参考答案尚未全部转写为网页解析，带有图形或 OCR 校对标记的题目应对照原始课程资料。
+
+---
 
 ## 当前内容
 - 53 道已整理题目、257 组本站测试数据：原有 49 题保留，新补 2019 夏令营第一组环形队列、第二组字符串格式化、2020 夏令营函数调用、2021 复试机场登机口调整模拟各 1 题；新增题目均标明公开历史题源及重建范围。
