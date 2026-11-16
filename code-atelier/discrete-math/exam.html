@@ -234,7 +234,19 @@ function renderReview(){
  const max=Math.max(1,...groups.map(([k,v])=>v.years.size));
  $("frequency").innerHTML=groups.map(([k,v])=>'<div class="statline"><span style="width:180px;max-width:45%;line-height:1.5">'+esc(k.replace(/-/g," · "))+'</span><div class="track"><i style="width:'+(v.years.size/max*100)+'%"></i></div><span style="min-width:45px;text-align:right">'+v.years.size+' 学年</span></div>').join("")+'<p class="soft">这里只统计已录入的历年判断题，不包括整张卷子的所有大题。</p>';
  const attempts=Object.values(saved.records).reduce((s,r)=>s+(r.attempts||0),0),wrong=Object.values(saved.records).reduce((s,r)=>s+(r.wrong||0),0),correct=Object.values(saved.records).reduce((s,r)=>s+(r.correct||0),0);
- $("reviewStats").innerHTML='<div class="controls"><span class="label">总作答 '+attempts+' 次</span><span class="label green">答对 '+correct+' 次</span><span class="label red">答错 '+wrong+' 次</span><span class="label">收藏 '+saved.bookmarks.length+' 道</span></div>'+(saved.lastResult?'<p class="soft">最近一次模拟卷：'+saved.lastResult.correct+'/'+saved.lastResult.total+' · '+esc(saved.lastResult.at.slice(0,10))+'</p>':"");
+ const topicStats=topics.map(topic=>{
+  const qs=GRADABLE.filter(q=>q.topic===topic);
+  const total=qs.reduce((n,q)=>n+(saved.records[q.id]?.attempts||0),0);
+  const hit=qs.reduce((n,q)=>n+(saved.records[q.id]?.correct||0),0);
+  const wrong=qs.reduce((n,q)=>n+(saved.records[q.id]?.wrong||0),0);
+  const due=qs.filter(q=>isDue(q.id)).length;
+  return {topic,total,hit,wrong,due,rate:total?hit/total:null,questionCount:qs.length};
+ }).sort((a,b)=>b.due-a.due||(a.rate??1)-(b.rate??1));
+ const topicRows=topicStats.map(s=>'<div class="statline"><span style="width:100px;font-weight:700">'+esc(s.topic)+'</span><span class="track"><i style="width:'+(s.rate===null?0:Math.round(s.rate*100))+'%"></i></span><span class="soft" style="min-width:90px;text-align:right">'+(s.total?Math.round(s.rate*100)+'% · '+s.total+' 次':'未练')+'</span><button class="btn" data-focus-topic="'+esc(s.topic)+'">练习</button></div><p class="soft" style="margin:-5px 0 8px 111px">'+s.questionCount+' 道原题 · '+s.due+' 道到期 · '+s.wrong+' 次历史错误'+(s.total&&s.total<3?' · 样本较少':'')+'</p>').join("");
+ $("reviewStats").innerHTML='<div class="controls"><span class="label">总作答 '+attempts+' 次</span><span class="label green">答对 '+correct+' 次</span><span class="label red">答错 '+wrong+' 次</span><span class="label">收藏 '+saved.bookmarks.length+' 道</span></div>'+(saved.lastResult?'<p class="soft">最近一次模拟卷：'+saved.lastResult.correct+'/'+saved.lastResult.total+' · '+esc(saved.lastResult.at.slice(0,10))+'</p>':"")+'<div class="divider"></div><h3>各知识模块练习情况</h3><p class="soft">按当前浏览器的作答次数计算正确率；样本少时不要把它理解成能力测评的准确分数。</p>'+topicRows;
+ $("reviewStats").querySelectorAll("[data-focus-topic]").forEach(b=>b.addEventListener("click",()=>{
+  $("year").value="";$("topic").value=b.dataset.focusTopic;$("status").value="";$("query").value="";showTab("practice");
+ }));
 }
 $("downloadProgress").addEventListener("click",()=>{
  const json=JSON.stringify({exportedAt:new Date().toISOString(),source:"Code Atelier Discrete Math II",progress:saved},null,2);
