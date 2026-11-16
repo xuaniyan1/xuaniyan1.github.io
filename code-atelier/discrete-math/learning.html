@@ -36,7 +36,7 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
  <div class="stat"><strong>40</strong><span>2025 秋作业核心题</span></div>
  <div class="stat"><strong>11</strong><span>历年试卷/回忆版记录</span></div>
  <div class="stat"><strong>18</strong><span>证明方法卡</span></div>
- <div class="stat"><strong>2</strong><span>交互实验室</span></div>
+ <div class="stat"><strong>3</strong><span>交互实验室</span></div>
 </section>
 <nav class="tabs" aria-label="学习地图导航">
  <button class="tab active" data-tab="overview">课程地图</button>
@@ -112,6 +112,15 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
    <div class="lab-actions"><button class="btn primary" id="checkPoset">分析偏序</button><button class="btn" id="resetPoset">恢复原题</button></div>
    <div id="posetResult" class="result">点击“分析偏序”。</div>
    <p class="hint">这里的边表示覆盖关系，不是完整的 ≤ 关系；程序会自动补齐传递关系。若输入产生有向环，就不是偏序。</p>
+  </div>
+  <div class="lab">
+   <h3>Huffman 最优叶加权二叉树</h3>
+   <p>对应 2022 图论复习课件第 4 页的计算题；默认权值应得到带权路径长度 590。也可替换为自己的权值组。</p>
+   <label for="huffmanWeights">叶结点权值（逗号分隔，正数）</label>
+   <input class="searchbar" id="huffmanWeights" value="5, 10, 17, 23, 29, 37, 41, 49" spellcheck="false">
+   <div class="lab-actions"><button class="btn primary" id="runHuffman">构造 Huffman 树</button></div>
+   <div id="huffmanResult" class="result">点击“构造 Huffman 树”。</div>
+   <p class="hint">每一步取当前最小的两个权值合并；所有合并权值之和等于最优带权路径长度。</p>
   </div>
  </div>
 </section>
@@ -258,6 +267,58 @@ $("checkPoset").addEventListener("click",analyzePoset);
 $("resetPoset").addEventListener("click",()=>{$("posetInput").value=defaultCovers.map(x=>x.join(",")).join("; ");$("subsetPreset").value="x2,x3,x4";analyzePoset();});
 $("subsetPreset").addEventListener("change",analyzePoset);
 analyzePoset();
+
+/* Huffman lab: greedy merge, tree depth and weighted path length. */
+function runHuffman(){
+ try{
+  const weights=$("huffmanWeights").value.split(/[,，;\s]+/).map(x=>x.trim()).filter(Boolean).map(Number);
+  if(weights.length<2)throw new Error("至少输入两个正权值。");
+  if(weights.some(x=>!Number.isFinite(x)||x<=0))throw new Error("所有权值都必须是有限正数。");
+  let order=0;
+  let nodes=weights.map((weight,index)=>({weight,label:"w"+(index+1),leaf:true,index,order:order++}));
+  const merges=[];
+  while(nodes.length>1){
+   nodes.sort((a,b)=>a.weight-b.weight||a.order-b.order);
+   const left=nodes.shift(),right=nodes.shift();
+   const parent={weight:left.weight+right.weight,left,right,leaf:false,order:order++};
+   merges.push({a:left.weight,b:right.weight,sum:parent.weight});
+   nodes.push(parent);
+  }
+  const root=nodes[0];let weightedLength=0,maxDepth=0,leafIndex=0;
+  function place(node,depth){
+   node.y=28+depth*62;maxDepth=Math.max(maxDepth,depth);
+   if(node.leaf){node.x=35+leafIndex*76;leafIndex++;weightedLength+=node.weight*depth;return;}
+   place(node.left,depth+1);place(node.right,depth+1);node.x=(node.left.x+node.right.x)/2;
+  }
+  place(root,0);
+  const width=Math.max(440,weights.length*76+30),height=58+(maxDepth+1)*62;
+  const lines=[],circles=[],labels=[];
+  function draw(node){
+   if(node.leaf)return;
+   for(const child of [node.left,node.right]){
+    lines.push('<line x1="'+node.x.toFixed(1)+'" y1="'+(node.y+15).toFixed(1)+'" x2="'+child.x.toFixed(1)+'" y2="'+(child.y-15).toFixed(1)+'" stroke="#789184" stroke-width="2"/>');
+    draw(child);
+   }
+   circles.push('<circle cx="'+node.x.toFixed(1)+'" cy="'+node.y.toFixed(1)+'" r="15" fill="#eaf2ec" stroke="#47765a" stroke-width="1.7"/>');
+   labels.push('<text x="'+node.x.toFixed(1)+'" y="'+(node.y+4).toFixed(1)+'" text-anchor="middle" font-size="10" fill="#315640">'+node.weight+'</text>');
+  }
+  function drawLeaves(node){
+   if(node.leaf){
+    circles.push('<circle cx="'+node.x.toFixed(1)+'" cy="'+node.y.toFixed(1)+'" r="16" fill="#edf3f5" stroke="#557b8b" stroke-width="1.7"/>');
+    labels.push('<text x="'+node.x.toFixed(1)+'" y="'+(node.y+3).toFixed(1)+'" text-anchor="middle" font-size="10" fill="#365c6c">'+node.weight+'</text>');
+    labels.push('<text x="'+node.x.toFixed(1)+'" y="'+(node.y+29).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#718076">w'+(node.index+1)+'</text>');
+    return;
+   }
+   draw(node);
+   drawLeaves(node.left);drawLeaves(node.right);
+  }
+  drawLeaves(root);
+  const mergeHtml=merges.map((m,i)=>'<div>'+String(i+1)+'. '+m.a+' + '+m.b+' → <b>'+m.sum+'</b></div>').join("");
+  $("huffmanResult").innerHTML='<b class="good">构造完成</b><br><b>合并顺序：</b>'+mergeHtml+'<br><b>合并权值之和：</b>'+merges.reduce((a,m)=>a+m.sum,0)+'<br><b>按叶深度计算：</b>'+weightedLength+'<br><svg viewBox="0 0 '+width+' '+height+'" width="100%" role="img" aria-label="Huffman 二叉树">'+lines.join("")+circles.join("")+labels.join("")+'</svg>';
+ }catch(e){$("huffmanResult").innerHTML='<span class="bad">输入错误：</span>'+esc(e.message);}
+}
+$("runHuffman").addEventListener("click",runHuffman);
+runHuffman();
 })();
 </script>
 </body></html>
