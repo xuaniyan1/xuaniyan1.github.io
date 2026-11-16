@@ -312,7 +312,7 @@ async function init(){
   ["assignmentSelect","typeSelect","difficultySelect","yearSelect","topicSelect"].forEach(id=>$(id).addEventListener("change",renderList));
   $("statusList").querySelectorAll("[data-status]").forEach(b=>b.addEventListener("click",()=>setStatus(b.dataset.status)));
   $("resetFilters").addEventListener("click",resetFilters);
-  $("randomBtn").addEventListener("click",()=>{if(!visible.length){toast("当前筛选下没有题目");return;}selectedId=visible[Math.floor(Math.random()*visible.length)].id;renderList();});
+  $("randomBtn").addEventListener("click",()=>{if(!visible.length){toast("当前筛选下没有题目");return;}selectedId=visible[Math.floor(Math.random()*visible.length)].id;showSolutions=false;$("solutionModeBtn").textContent="先做题模式：开";renderList();});
  }catch(e){$("questionList").innerHTML='<div class="empty">题库加载失败：'+esc(e.message)+'</div>';console.error(e);}
 }
 init();
