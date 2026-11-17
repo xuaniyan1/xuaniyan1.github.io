@@ -18,6 +18,18 @@ header{height:76px;border-bottom:1px solid rgba(220,228,218,.8);display:flex;ali
 .notice{margin:30px 0 60px;padding:17px 20px;border:1px solid #dfe6de;border-radius:14px;background:rgba(255,255,255,.55);display:flex;gap:12px;align-items:flex-start;color:#78847b;font-size:11px;line-height:1.8}.notice b{color:#415448}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;color:#9aa39b;font-size:11px;display:flex;justify-content:space-between}
 @media(max-width:760px){.shell{padding:0 17px}.nav{gap:12px;font-size:11px}.hero{padding:52px 0 30px;grid-template-columns:1fr}.hero-side{border-left:0;border-top:1px solid #dce4dc;padding:12px 0 0}.cards{grid-template-columns:1fr}.module{min-height:290px;padding:22px}.quick{grid-template-columns:1fr}.module-foot{align-items:flex-end;gap:12px}.tags{max-width:58%}footer{gap:10px;flex-direction:column}}
+
+.cloud-panel{margin:14px 0 0;border:1px solid #dce7df;border-radius:12px;padding:10px 14px;background:#f6fbf7}
+.cloud-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#53705b;font-size:11px;line-height:1.7}
+.cloud-row b{color:#28573d;font-size:12px}
+.cloud-row a{color:#2c6948;font-weight:700}
+.cloud-row button{border:1px solid #bdd5c5;border-radius:8px;background:#fff;padding:7px 10px;font-size:11px;color:#285b41;font-weight:700;cursor:pointer}
+.cloud-row button:hover{background:#e5f2e9}
+.cloud-auth-form{display:flex;flex-wrap:wrap;gap:6px}
+.cloud-auth-form input{min-width:180px;border-radius:8px;padding:7px 10px;border:1px solid #c8d9ce;font-size:11px}
+.cloud-message{color:#7b8d80}
+@media(max-width:600px){.cloud-row{align-items:stretch}.cloud-auth-form{width:100%}.cloud-auth-form input{flex:1}}
+
 </style>
 </head>
 <body>
@@ -26,6 +38,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;color:#9aa39b;font-s
  <a class="brand" href="./"><span class="mark">CA</span><span>Code Atelier<small>PERSONAL PRACTICE SPACE</small></span></a>
  <nav class="nav"><a href="./data-structures.html">数据结构</a><a href="./discrete-math/">离散数学</a><a href="./buaa-exams/">北航真题</a></nav>
 </header>
+<div id="cloudAccount" class="cloud-panel" aria-live="polite"><div class="cloud-row"><b>账号登录 / 进度同步</b><span>正在连接登录服务……</span></div></div>
 <main>
  <section class="hero">
   <div><div class="eyebrow">A WORKSPACE BUILT FOR LEARNING</div><h1>把练习，变成自己的能力。</h1><p>这里是你的个人刷题工作台。把编程训练与数学训练放在同一个地方：按知识点练习，记录每一次卡住与突破，再回到错题中巩固。</p></div>
@@ -53,8 +66,10 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;color:#9aa39b;font-s
   <div class="quick-card"><div class="qicon">↺</div><b>错题与复盘</b><p>记录做错、不会和已掌握的题目，逐渐形成自己的复习闭环。</p></div>
   <div class="quick-card"><div class="qicon">✎</div><b>保留解题过程</b><p>把思路、证明过程和调试笔记留下来，下一次从上次卡住的地方继续。</p></div>
  </section>
- <div class="notice"><span>ⓘ</span><div><b>当前版本说明：</b>离散数学 2 以 2025 秋季作业 40 题为重点，已逐题扩充参考解答思路、推导、结论与易错点；第七次作业原 PDF 标注为 2024 秋，单独归档。题目进度、收藏和草稿暂存在当前浏览器，清理浏览器站点数据可能会丢失。</div></div>
+ <div class="notice"><span>ⓘ</span><div><b>进度保存说明：</b>游客模式的记录保存在当前浏览器；登录账号后，进入各训练模块即可加载并同步对应进度。首次使用某个模块时，可在模块页面选择导入原有游客记录。</div></div>
 </main>
 <footer><span>CODE ATELIER · YOUR PERSONAL PRACTICE SPACE</span><span>Keep learning. Keep reviewing.</span></footer>
 </div>
+<script src="./discrete-math/cloud-config.js?v=20261117-login3"></script>
+<script src="./discrete-math/cloud-sync.js?v=20261117-login3"></script>
 </body></html>
