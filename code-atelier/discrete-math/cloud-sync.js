@@ -16,6 +16,27 @@
   var status = "本机保存";
   var accountError = "";
 
+  // Supabase returns auth failures in the URL fragment. Surface the actual
+  // reason in the account panel instead of leaving the user in a silent guest state.
+  function consumeAuthCallbackError() {
+    var hash = window.location.hash || "";
+    if (!hash || hash.indexOf("error_code=") < 0) return;
+    var params;
+    try { params = new URLSearchParams(hash.charAt(0) === "#" ? hash.slice(1) : hash); }
+    catch (_) { return; }
+    var code = params.get("error_code");
+    if (!code) return;
+    if (code === "otp_expired") {
+      accountError = "邮件登录链接已过期或已被使用。请重新输入邮箱发送最新邮件，并只点击最新邮件中的链接一次。如果刚收到就失效，可能是邮箱安全扫描提前打开了链接；届时建议改用邮件验证码登录。";
+    } else {
+      accountError = "邮件验证未完成（" + code + "）。请重新发送登录邮件后再试。";
+    }
+    try {
+      window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+    } catch (_) {}
+  }
+  consumeAuthCallbackError();
+
   function $() { return document.getElementById("cloudAccount"); }
   function esc(x) {
     return String(x == null ? "" : x).replace(/[&<>"']/g, function (ch) {
@@ -83,7 +104,7 @@
             options: { emailRedirectTo: location.origin + location.pathname }
           });
           if (result.error) throw result.error;
-          accountError = "登录邮件已发送，请查收邮件并点击链接。";
+          accountError = "登录邮件已发送，请使用最新邮件中的链接。链接仅能使用一次。";
         } catch (err) { accountError = "发送失败：" + err.message; }
         render();
       });
