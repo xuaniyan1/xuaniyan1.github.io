@@ -1,11 +1,11 @@
 # Code Atelier 离散数学 2｜启用登录与云端进度
 
-当前网站已接入**可选**的 Supabase Auth + Postgres 进度保存代码。没有配置时，原来的本机游客刷题继续可用；网站不会自动上传游客数据。本文件是配置说明，尚未创建 Supabase 项目。
+当前网站已接入 Supabase Auth + Postgres 进度保存代码，且已写入项目 URL 与 publishable key。**下一步需要你在 Supabase Dashboard 执行 SQL、启用 Email 登录并配置 Redirect URLs**，真实登录才能开始。游客刷题仍可继续使用，游客数据不会自动上传。
 
 ## 1. 创建项目
 
-1. 打开 https://supabase.com/dashboard ，选择 New Project。
-2. 从 Dashboard 复制 Project URL 和 publishable key（部分旧项目使用 anon public key）。
+1. 你已提供现有项目 URL 和 publishable key，网站配置文件已更新，无需再创建项目。
+2. 如果将来轮换 publishable key，再从 Dashboard 复制新值更新 cloud-config.js。
 3. 千万不要把数据库密码、secret、service_role key、GitHub OAuth Client Secret 写进公开前端。
 
 ## 2. 创建进度表与安全策略
@@ -32,17 +32,11 @@ Site URL 推荐设置为第一个。正式公开运营时还需核实邮件发�
 
 ## 4. 前端配置
 
-编辑 [cloud-config.js](./cloud-config.js)：
-
-    window.DM2_CLOUD_CONFIG = {
-      url: "https://YOUR_PROJECT_REF.supabase.co",
-      publishableKey: "sb_publishable_YOUR_PUBLIC_KEY",
-      enableGitHub: false
-    };
+这一步已完成：仓库中的 [cloud-config.js](./cloud-config.js) 已写入你提供的 Project URL 和 publishable key，邮箱登录已准备好，GitHub 登录仍关闭。
 
 Project URL 和 publishable key 是设计给公开浏览器使用的。真正的数据访问限制依靠 Supabase Auth 身份验证与数据库 RLS；绝不能上传 secret、service_role key 或数据库密码。
 
-提交 GitHub 后等待 GitHub Pages 部署。浏览器需要能加载 Supabase JS CDN 和项目域名；如果无法访问，游客模式仍能使用。
+GitHub Pages 部署后，浏览器需要能加载 Supabase JS CDN 和项目域名；如果无法访问，游客模式仍能使用。
 
 ## 5. 现有进度怎样迁移？
 
