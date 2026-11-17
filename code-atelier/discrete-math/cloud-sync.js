@@ -167,7 +167,17 @@
       warning: "", dirty: false
     }, hooks));
     render();
-    if (enabled) boot();
+    if (enabled) {
+      if (client && user) {
+        loadSection(sections.get(hooks.section)).then(render).catch(function (err) {
+          var entry = sections.get(hooks.section);
+          if (entry) entry.warning = "加载账号进度失败：" + err.message;
+          render();
+        });
+      } else {
+        boot();
+      }
+    }
   }
 
   async function loadSection(e) {
@@ -375,4 +385,9 @@
     configured: enabled,
     getUser: function () { return user; }
   };
+
+  // Render the account panel as soon as this script loads. It must not depend
+  // on the homework question bundle finishing its asynchronous decompression.
+  if (enabled) boot();
+  else render();
 })();
