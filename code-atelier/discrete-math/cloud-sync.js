@@ -251,13 +251,26 @@
     bootPromise = (async function () {
       try {
         if (!window.supabase || !window.supabase.createClient) {
-          await new Promise(function (resolve, reject) {
-            var script = document.createElement("script");
-            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-            script.onload = resolve;
-            script.onerror = function () { reject(new Error("Supabase JS 加载失败，请检查网络")); };
-            document.head.appendChild(script);
-          });
+          var cdnUrls = [
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+            "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"
+          ];
+          var lastCdnError = null;
+          for (var cdnUrl of cdnUrls) {
+            try {
+              await new Promise(function (resolve, reject) {
+                var script = document.createElement("script");
+                script.src = cdnUrl;
+                script.onload = resolve;
+                script.onerror = function () { reject(new Error("无法加载 " + cdnUrl)); };
+                document.head.appendChild(script);
+              });
+              if (window.supabase && window.supabase.createClient) break;
+            } catch (cdnError) { lastCdnError = cdnError; }
+          }
+          if (!window.supabase || !window.supabase.createClient) {
+            throw lastCdnError || new Error("Supabase JS 加载失败，请检查网络");
+          }
         }
         client = window.supabase.createClient(cfg.url, cfg.publishableKey);
         render();
