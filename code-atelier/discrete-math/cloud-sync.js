@@ -106,13 +106,14 @@
     var trouble = e && e.conflict;
     var warning = e && e.warning ? e.warning : "";
     root.innerHTML = '<div class="cloud-row"><b>已登录 · ' + esc(user.email || user.id.slice(0, 8)) + '</b>' +
-      '<span class="cloud-message">' + esc(warning || status || "云同步已启用") + '</span>' +
-      '<button type="button" id="dm2SyncNow">立即同步</button>' +
+      '<span class="cloud-message">' + esc(warning || (e ? status || "云同步已启用" : "账号已连接；进入训练模块后自动加载并同步对应进度。")) + '</span>' +
+      (e ? '<button type="button" id="dm2SyncNow">立即同步</button>' : '') +
       (showImport ? '<button type="button" id="dm2ImportGuest">导入此设备游客进度</button>' : '') +
       (trouble ? '<button type="button" id="dm2UseCloud">使用云端版本</button>' +
         '<button type="button" id="dm2KeepLocal">用本机版本覆盖云端</button>' : '') +
       '<button type="button" id="dm2Logout">退出登录</button></div>';
-    root.querySelector("#dm2SyncNow").addEventListener("click", function () {
+    var syncButton = root.querySelector("#dm2SyncNow");
+    if (syncButton) syncButton.addEventListener("click", function () {
       if (e) flush(e, true);
     });
     var importButton = root.querySelector("#dm2ImportGuest");
